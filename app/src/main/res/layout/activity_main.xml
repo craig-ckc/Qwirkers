@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".MainActivity">
+
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-8dp"
+        android:scrollbars="none"
+        android:background="@color/neutral_200"
+        app:layout_constraintBottom_toTopOf="@+id/hand_deck"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/players">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <GridView
+                android:id="@+id/game_board"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:horizontalSpacing="2dp"
+                android:numColumns="auto_fit"
+                android:scrollbars="none"
+                android:verticalSpacing="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/players"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/hand_deck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/neutral_100"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="4dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="4dp"
+            android:paddingLeft="6dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/player_hand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </FrameLayout>
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/horizontalScrollView"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/button"
+            android:drawableTop="@drawable/ic_done"
+            android:drawableTint="@color/highlight"
+            android:onClick="done"
+            android:padding="2dp"
+            android:text="@string/done"
+            android:textColor="@color/black"
+            android:textSize="@dimen/button_font_size"
+            app:backgroundTint="@color/neutral_100" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_spacing" />
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:onClick="undo"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/button"
+            android:drawableTop="@drawable/ic_undo"
+            android:padding="2dp"
+            android:text="@string/undo"
+            android:textColor="@color/black"
+            android:textSize="@dimen/button_font_size"
+            app:backgroundTint="@color/neutral_100"
+            android:drawableTint="@color/highlight"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_spacing" />
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:onClick="clear"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/button"
+            android:drawableTop="@drawable/ic_clear"
+            android:padding="2dp"
+            android:text="@string/clear"
+            android:textColor="@color/black"
+            android:textSize="@dimen/button_font_size"
+            app:backgroundTint="@color/neutral_100"
+            android:drawableTint="@color/highlight"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="64dp" />
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:onClick="trade"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/button"
+            android:drawableTop="@drawable/ic_trade"
+            android:padding="2dp"
+            android:text="@string/trade"
+            android:textColor="@color/black"
+            android:textSize="@dimen/button_font_size"
+            app:backgroundTint="@color/neutral_100"
+            android:drawableTint="@color/highlight"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_spacing" />
+
+        <Button
+            style="@style/Widget.Material3.Button"
+            android:onClick="pass"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/button"
+            android:drawableTop="@drawable/ic_pass"
+            android:padding="2dp"
+            android:text="@string/pass"
+            android:textColor="@color/black"
+            android:textSize="@dimen/button_font_size"
+            app:backgroundTint="@color/neutral_100"
+            android:drawableTint="@color/highlight"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

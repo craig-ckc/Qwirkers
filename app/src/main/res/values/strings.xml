@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Qwirkers</string>
+    <string name="done">Done</string>
+    <string name="undo">Undo</string>
+    <string name="clear">Clear</string>
+    <string name="trade">Trade</string>
+    <string name="pass">Pass</string>
+    <string name="blank">_</string>
+</resources>

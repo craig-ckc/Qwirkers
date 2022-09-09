@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tile_size">60dp</dimen>
+    <dimen name="button_spacing">12dp</dimen>
+    <dimen name="button_font_size">12sp</dimen>
+    <dimen name="player_badge_size">24dp</dimen>
+    <dimen name="player_badge_half_size">6dp</dimen>
+    <dimen name="player_badge_half_size_reverse">-20dp</dimen>
+</resources>
