@@ -1,9 +1,10 @@
 package QwirkleGame.Game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public class Player implements Serializable {
 	private String name;
 	private List<Tile> hand;
 	private int profileImg;

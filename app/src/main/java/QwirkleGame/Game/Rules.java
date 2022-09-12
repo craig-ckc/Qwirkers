@@ -119,17 +119,17 @@ public class Rules {
 
     private boolean isNeighbourhoodValid(List<Tile> top, List<Tile> right, List<Tile> down, List<Tile> left, Tile tile) {
 
-        if (top.size() + down.size() > MAXLINELENGHT)
+        if (top.size() + down.size() - 1> MAXLINELENGHT)
             return false;
 
-        if (right.size() + left.size() > MAXLINELENGHT)
+        if (right.size() + left.size() - 1> MAXLINELENGHT)
             return false;
 
         try {
             Tile t = top.get(1);
             Tile d = down.get(1);
 
-            if (t.isSimilar(tile) != d.isSimilar(tile))
+            if (t.getSimilar(tile) != d.getSimilar(tile))
                 return false;
         } catch (Exception e) {
             // TODO: handle exception
@@ -139,7 +139,7 @@ public class Rules {
             Tile r = right.get(1);
             Tile l = left.get(1);
 
-            if (r.isSimilar(tile) != l.isSimilar(tile))
+            if (r.getSimilar(tile) != l.getSimilar(tile))
                 return false;
         } catch (Exception e) {
             // TODO: handle exception
@@ -163,13 +163,13 @@ public class Rules {
             if (prev.equal(line.get(i)))
                 return false;
 
-        // CASE 04: Check if all the Tiles in the line have the same similar attribute
-        Object obj = prev.isSimilar(line.get(1));
+        // CASE 04: Check if all the Tiles in the line have a similar attribute
+        Object obj = prev.getSimilar(line.get(1));
 
         if (obj == null) return false;
 
         for (int i = 1; i < line.size(); i++) {
-            if (obj != prev.isSimilar(line.get(i)))
+            if (obj != prev.getSimilar(line.get(i)))
                 return false;
 
             prev = line.get(i);

@@ -28,7 +28,6 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
     private View.OnClickListener onClickListener;
     private List<Tile> tiles;
     private Tile selectedTile;
-    private boolean multiselect = false;
 
     public HandAdapter(Context context, List<Tile> tiles) {
         this.context = context;
@@ -66,14 +65,25 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
         notifyItemChanged(tiles.size() - 1);
     }
 
+    public void add(List<Tile> tiles) {
+        for(Tile tile :tiles){
+            add(tile);
+        }
+    }
+
     public void remove(int position) {
         tiles.remove(position);
         notifyItemRemoved(position);
     }
 
     public void remove(Tile tile) {
-        tiles.remove(tile);
-        notifyItemRemoved(tiles.indexOf(tile));
+        remove(tiles.indexOf(tile));
+    }
+
+    public void remove(List<Tile> tiles) {
+        for(Tile tile :tiles){
+            remove(tile);
+        }
     }
 
     public Tile get(int position) {
@@ -95,14 +105,6 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
         this.tiles = tiles;
 
         notifyDataSetChanged();
-    }
-
-    public void setMultiselect(boolean multiselect) {
-        this.multiselect = multiselect;
-    }
-
-    public boolean isMultiselect() {
-        return multiselect;
     }
 
     public List<TileViewHolder> getViewHolderList() {
@@ -169,7 +171,7 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
         public void highlight() {
             if (selectedTile == tile) {
                 itemView.setStrokeColor(ContextCompat.getColor(context, R.color.highlight));
-            } else if(!multiselect) {
+            } else {
                 itemView.setStrokeColor(ContextCompat.getColor(context, R.color.transparent));
             }
         }

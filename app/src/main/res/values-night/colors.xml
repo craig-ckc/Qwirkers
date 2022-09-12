@@ -10,17 +10,18 @@
 
     <color name="ripple">#6598FD</color>
 
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#FF000000</color>
 
-    <color name="neutral_100">#ECEFF4</color>
-    <color name="neutral_200">#E3E5EB</color>
-    <color name="neutral_300">#BABEC6</color>
-    <color name="neutral_400">#9499A4</color>
-    <color name="neutral_500">#575A62</color>
-    <color name="neutral_600">#42454C</color>
-    <color name="neutral_700">#2E3035</color>
-    <color name="neutral_800">#191B1F</color>
+    <color name="neutral_800">#ECEFF4</color>
+    <color name="neutral_700">#E3E5EB</color>
+    <color name="neutral_600">#BABEC6</color>
+    <color name="neutral_500">#9499A4</color>
+    <color name="neutral_400">#575A62</color>
+    <color name="neutral_300">#42454C</color>
+    <color name="neutral_200">#2E3035</color>
+    <color name="neutral_100">#191B1F</color>
+
 
     <color name="red">#FF453A</color>
     <color name="orange">#FF9F0A</color>

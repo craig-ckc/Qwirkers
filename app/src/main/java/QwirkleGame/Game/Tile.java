@@ -20,7 +20,7 @@ public class Tile {
         return this.color;
     }
 
-    public Object isSimilar(Tile tile) {
+    public Object getSimilar(Tile tile) {
         if (this.shape == tile.getShape()) {
             return this.shape;
         } else if (this.color == tile.getColor()) {

@@ -15,11 +15,11 @@
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/player_badge"
+        app:layout_constraintEnd_toStartOf="@+id/player_name_tag"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/transparent"
-        app:strokeWidth="1dp">
+        app:strokeWidth="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -75,7 +75,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/player_badge"
+        android:id="@+id/player_name_tag"
         android:layout_width="@dimen/player_badge_size"
         android:layout_height="@dimen/player_badge_size"
         app:cardBackgroundColor="@color/neutral_200"

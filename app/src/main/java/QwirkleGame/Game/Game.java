@@ -15,10 +15,10 @@ public class Game {
     private List<Move> moves;
     private int playerCount; // helper number to change the players
 
-    public Game(Player[] players) {
+    public Game(List<Player> players) {
         this.players = new ArrayList<>();
 
-        this.players.addAll(Arrays.asList(players));
+        this.players = players;
 
         this.moves = new ArrayList<>();
 
@@ -164,6 +164,10 @@ public class Game {
             }
             System.out.println();
         }
+    }
+
+    public int getBagSize(){
+        return bag.getSize();
     }
 
     public Player getCurrentPlayer() {
