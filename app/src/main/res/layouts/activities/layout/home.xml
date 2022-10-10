@@ -34,7 +34,7 @@
         app:layout_constraintTop_toBottomOf="@+id/qwirkers_logo_home" />
 
     <ImageView
-        android:id="@+id/peeps"
+        android:id="@+id/offline_icon"
         android:layout_width="0dp"
         android:layout_height="322dp"
         android:layout_marginStart="16dp"
@@ -54,7 +54,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="24dp"
-        android:onClick="showDialog"
+        android:onClick="gameMode"
         android:text="@string/play"
         android:textSize="24sp"
         android:background="@drawable/button_background_primary"
@@ -73,7 +73,7 @@
         android:layout_marginBottom="32dp"
         android:text="@string/settings"
         android:textSize="16sp"
-        android:textColor="@color/primary"
+        android:textColor="@color/black"
         android:background="@drawable/button_background_secondary"
         app:backgroundTint="@color/neutral_300"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,7 +89,7 @@
         android:layout_marginEnd="8dp"
         android:text="@string/rules"
         android:textSize="16sp"
-        android:textColor="@color/primary"
+        android:textColor="@color/black"
         android:background="@drawable/button_background_secondary"
         app:backgroundTint="@color/neutral_300"
         app:layout_constraintEnd_toEndOf="parent"

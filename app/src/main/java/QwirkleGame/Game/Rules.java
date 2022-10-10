@@ -64,40 +64,51 @@ public class Rules {
 
     // endregion
 
-
     // region GAMEPLAY
 
-    public boolean checkWinCondition(Player currentPlayer, Bag bag){
+    public boolean checkWinCondition(Player currentPlayer, Bag bag) {
         return currentPlayer.getHand().size() == 0 && bag.getSize() == 0;
     }
 
     public List<Position> validMoves(Tile tile, Board board) {
         List<Position> locations = new ArrayList<>();
-        Dimension[] dim = new Dimension[]{Dimension.DIMX, Dimension.DIMY};
+        Dimension[] dim = new Dimension[] { Dimension.DIMX, Dimension.DIMY };
 
         this.board = board;
 
-        if(board.isEmpty()){
-            locations.add( new Position((Dimension.DIMX.getDim() / 2) , (Dimension.DIMY.getDim() / 2)));
+        if (board.isEmpty()) {
+            locations.add(new Position((Dimension.DIMX.getDim() / 2), (Dimension.DIMY.getDim() / 2)));
             return locations;
         }
 
-        for (int x = 0; x < dim[0].getDim(); x++)
-            for (int y = 0; y < dim[1].getDim(); y++)
-                if (isValid(x, y, tile)) {
-                    locations.add(new Position( x , y));
-                }
+        // NOTE: This iterates through every block which takes up too much time
+        // for (int x = 0; x < dim[0].getDim(); x++)
+        //     for (int y = 0; y < dim[1].getDim(); y++)
+        //         if (isValid(new Position(x, y), tile)) {
+        //             locations.add(new Position(x, y));
+        //         }
+
+        List<Position> potential = getPotentialBlocks();
+
+        for (Position position : potential) {
+            if (isValid(position, tile)) {
+                locations.add(position);
+            }
+        }
 
         return locations;
     }
 
-    public boolean isValid(int x, int y, Tile tile) {
+    public boolean isValid(Position pos, Tile tile) {
+        int x = pos.getX();
+        int y = pos.getY();
+
         // CASE 00: when the board is empty
         if (board.isEmpty() && x == Dimension.DIMX.getDim() / 2 && y == Dimension.DIMY.getDim() / 2)
             return true;
 
         // CASE 01: Check if the block is empty
-        if (board.getBlock(x, y) != null)
+        if (board.getBlock(new Position(x, y)) != null)
             return false;
 
         // CASE 02: Check if the block is connected to a tile
@@ -117,12 +128,13 @@ public class Rules {
         return isNeighbourhoodValid(top, right, down, left, tile);
     }
 
-    private boolean isNeighbourhoodValid(List<Tile> top, List<Tile> right, List<Tile> down, List<Tile> left, Tile tile) {
+    private boolean isNeighbourhoodValid(List<Tile> top, List<Tile> right, List<Tile> down, List<Tile> left,
+            Tile tile) {
 
-        if (top.size() + down.size() - 1> MAXLINELENGHT)
+        if (top.size() + down.size() - 1 > MAXLINELENGHT)
             return false;
 
-        if (right.size() + left.size() - 1> MAXLINELENGHT)
+        if (right.size() + left.size() - 1 > MAXLINELENGHT)
             return false;
 
         try {
@@ -166,7 +178,8 @@ public class Rules {
         // CASE 04: Check if all the Tiles in the line have a similar attribute
         Object obj = prev.getSimilar(line.get(1));
 
-        if (obj == null) return false;
+        if (obj == null)
+            return false;
 
         for (int i = 1; i < line.size(); i++) {
             if (obj != prev.getSimilar(line.get(i)))
@@ -181,11 +194,11 @@ public class Rules {
     private List<Tile> getNeighbours(int x, int y) {
         List<Tile> tiles = new ArrayList<Tile>();
 
-        Direction[] dirs = new Direction[]{Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
+        Direction[] dirs = new Direction[] { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT };
 
         for (Direction dir : dirs) {
-            if ((board.getBlock(x + dir.getX(), y + dir.getY()) != null))
-                tiles.add(board.getBlock(x + dir.getX(), y + dir.getY()));
+            if ((board.getBlock(new Position(x + dir.getX(), y + dir.getY())) != null))
+                tiles.add(board.getBlock(new Position(x + dir.getX(), y + dir.getY())));
         }
 
         return tiles;
@@ -199,8 +212,8 @@ public class Rules {
         x += dir.getX();
         y += dir.getY();
 
-        while (board.getBlock(x, y) != null) {
-            tiles.add(board.getBlock(x, y));
+        while (board.getBlock(new Position(x, y)) != null) {
+            tiles.add(board.getBlock(new Position(x, y)));
 
             x += dir.getX();
             y += dir.getY();
@@ -211,16 +224,15 @@ public class Rules {
 
     // endregion
 
-
     // region SCORING
 
     public int scorePlayer(int x, int y) {
         int points = 0;
 
-        Direction[] dirs = new Direction[]{Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
+        Direction[] dirs = new Direction[] { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT };
 
         for (Direction dir : dirs) {
-            List<Tile> line = getLine(x, y, dir, board.getBlock(x, y));
+            List<Tile> line = getLine(x, y, dir, board.getBlock(new Position(x, y)));
             points += (line.size() > 1) ? line.size() : 0;
         }
 
@@ -242,4 +254,20 @@ public class Rules {
     }
 
     // endregion
+
+    private List<Position> getPotentialBlocks(){
+        List<Position> potential = new ArrayList<>();
+        List<Position> filledBlocks = board.getFilledBlocks();
+
+        for (Position position: filledBlocks) {
+            for (Direction dir : Direction.values()) { 
+                Position pos = new Position(position.getX() + dir.getX(), position.getY() + dir.getY());
+                if(board.getBlock(pos) == null){
+                    potential.add(pos);
+                }
+            }
+        }
+
+        return potential;
+    }
 }

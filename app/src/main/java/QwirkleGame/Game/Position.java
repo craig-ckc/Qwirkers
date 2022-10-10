@@ -1,6 +1,6 @@
 package QwirkleGame.Game;
 
-public class Position {
+public class Position implements Comparable<Position>{
 	private final int x;
 	private final int y;
 
@@ -38,6 +38,25 @@ public class Position {
 
 	public boolean equals(String position){
 		return (x + "," + y).equals(position);
+	}
+
+	@Override
+	public int compareTo(Position o) {
+		// TODO Auto-generated method stub
+
+		if (x == o.getX()) {
+			if (y == o.getY()) {
+				return 0;
+			} else if (y > o.getY()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		} else if (x > o.getX()) {
+			return 1;
+		} else {
+			return -1;
+		}
 	}
 
 }

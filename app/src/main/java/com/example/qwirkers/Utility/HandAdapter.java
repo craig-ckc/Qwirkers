@@ -1,4 +1,4 @@
-package com.example.qwirkers;
+package com.example.qwirkers.Utility;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qwirkers.R;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -102,9 +103,14 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
     }
 
     public void setTiles(List<Tile> tiles) {
-        this.tiles = tiles;
+        this.tiles.clear();
 
-        notifyDataSetChanged();
+        for(Tile tile : tiles){
+            add(tile);
+        }
+
+
+//        notifyDataSetChanged();
     }
 
     public List<TileViewHolder> getViewHolderList() {

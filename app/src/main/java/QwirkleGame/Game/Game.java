@@ -1,12 +1,11 @@
 package QwirkleGame.Game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-public class Game {
+public class Game implements Serializable {
     private Board board;
     private Rules rules;
     private Player currentPlayer;
@@ -16,18 +15,13 @@ public class Game {
     private int playerCount; // helper number to change the players
 
     public Game(List<Player> players) {
-        this.players = new ArrayList<>();
-
         this.players = players;
-
         this.moves = new ArrayList<>();
-
-        start();
     }
 
     // region SETUP
 
-    private void start() {
+    public void start() {
         board = new Board();
 
         rules = new Rules();
@@ -62,7 +56,7 @@ public class Game {
         return board.getBlocks();
     }
 
-    public Map<String, Tile> getBoard(int i) {
+    public Map<Position, Tile> getBoard(int i) {
         return board.getBoard();
     }
 
@@ -76,10 +70,10 @@ public class Game {
     }
 
     public boolean placeTile(Tile tile, Position position) {
-        if(!rules.isValid(position.getX(), position.getY(), tile)) return false;
+        if(!rules.isValid(position, tile)) return false;
 
         Move move = new Move(currentPlayer.removeTile(tile), position);
-        board.setBlock(position.getX(), position.getY(), tile);
+        board.setBlock(position, tile);
         moves.add(move);
 
         // TODO: check if the players hand is empty and the bag is empty as well (Win condition)
@@ -88,7 +82,7 @@ public class Game {
     }
 
     public void presetMoves(Tile tile, Position position) {
-        board.setBlock(position.getX(), position.getY(), tile);
+        board.setBlock(position, tile);
     }
 
 
@@ -123,7 +117,7 @@ public class Game {
 
         // remove tile board
         Position position = move.getPosition();
-        board.removeTile(position.getX(), position.getY());
+        board.removeTile(position);
 
         // return tile to players hand
         currentPlayer.receiveTile(move.getTile());

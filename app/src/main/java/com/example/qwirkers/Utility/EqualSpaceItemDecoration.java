@@ -1,4 +1,4 @@
-package com.example.qwirkers;
+package com.example.qwirkers.Utility;
 
 import android.graphics.Rect;
 import android.view.View;

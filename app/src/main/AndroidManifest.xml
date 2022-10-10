@@ -19,19 +19,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".OfflineLobby"
-            android:parentActivityName=".Home">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Home" />
-        </activity>
+        <activity android:name=".GameMode" />
 
-        <activity android:name=".GamePlay"
-            android:parentActivityName=".Home">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Home" />
-        </activity>
+        <activity android:name=".OfflineLobby" />
+
+        <activity android:name=".OnlineLobby" />
+
+        <activity android:name=".GamePlay" />
+
+        <activity android:name=".GameRanking" />
 
     </application>
 

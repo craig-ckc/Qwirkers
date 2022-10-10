@@ -1,4 +1,4 @@
-package com.example.qwirkers;
+package com.example.qwirkers.Utility;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.example.qwirkers.R;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -26,12 +27,12 @@ import QwirkleGame.Game.Position;
 import QwirkleGame.Game.Tile;
 
 public class BoardAdapter extends ArrayAdapter<Tile> {
-    private int resource;
-    private List<Position> validMoves;
     private final Context context;
-    private Map<String, Tile> board;
+    private final int resource;
+    private final Map<Position, Tile> board;
+    private List<Position> validMoves;
 
-    public BoardAdapter(@NonNull Context context, int resource, Map<String, Tile> board) {
+    public BoardAdapter(@NonNull Context context, int resource, Map<Position, Tile> board) {
         super(context, resource);
 
         this.board = board;
@@ -48,7 +49,7 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View block = (MaterialCardView) convertView;
+        View block = convertView;
         if (block == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             block = inflater.inflate(resource, null);
@@ -59,35 +60,35 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
 
         ImageView imageView = (ImageView) img;
 
-        List<Map.Entry<String, Tile>> stringsList = new ArrayList<>(board.entrySet());
+        List<Map.Entry<Position, Tile>> stringsList = new ArrayList<>(board.entrySet());
         Tile tile = stringsList.get(position).getValue();
 
 
-        if(tile == null){
+        if (tile == null) {
             imageView.setImageResource(R.drawable.empty);
-        }else{
+        } else {
             imageView.setImageResource(getTile(tile.getShape()));
             imageView.setColorFilter(getColor(tile.getColor()), PorterDuff.Mode.SRC_IN);
         }
 
         MaterialCardView card = (MaterialCardView) block;
 
-        String s = stringsList.get(position).getKey();
+        Position s = stringsList.get(position).getKey();
 
         boolean truth = false;
 
 
         for (Position pos : validMoves) {
-            if(s.equals(pos.toString())){
+            if (s.equals(pos)) {
                 truth = true;
                 break;
             }
         }
 
 
-        if(truth){
+        if (truth) {
             card.setCardBackgroundColor(ContextCompat.getColor(context, R.color.neutral_100));
-        }else{
+        } else {
             card.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white));
         }
 
@@ -95,19 +96,30 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
     }
 
 
-    public void highlightValidMoves(List<Position> validMoves){
+    public void highlightValidMoves(List<Position> validMoves) {
         this.validMoves = validMoves;
+
+//        for (Position pos : validMoves) {
+//            int position = getPos(pos);
+//            notifyDataSetChanged();
+//        }
+
         notifyDataSetChanged();
     }
 
-    public Position selectedPosition(int position){
-        List<Map.Entry<String, Tile>> stringsList = new ArrayList<>(board.entrySet());
-
-        return Position.getPosition(stringsList.get(position).getKey());
+    private int getPos(Position pos) {
+        return (Dimension.DIMX.getDim() * (pos.getX() % Dimension.DIMX.getDim())) + (Dimension.DIMY.getDim() * (pos.getY() % Dimension.DIMY.getDim()));
     }
 
-    private int getTile(Shape shape){
-        switch (shape){
+
+    public Position selectedPosition(int position) {
+        List<Map.Entry<Position, Tile>> positionList = new ArrayList<>(board.entrySet());
+
+        return positionList.get(position).getKey();
+    }
+
+    private int getTile(Shape shape) {
+        switch (shape) {
             case STAR:
                 return R.drawable.ic_star;
             case CROSS:
@@ -125,8 +137,8 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
         }
     }
 
-    private int getColor(Color color){
-        switch (color){
+    private int getColor(Color color) {
+        switch (color) {
             case RED:
                 return ContextCompat.getColor(context, R.color.red);
             case BLUE:

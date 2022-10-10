@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="20dp"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="@color/neutral_100"
+    app:strokeColor="@color/transparent"
+    app:cardElevation="0dp"
+    android:layout_marginBottom="32dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingTop="30dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="30dp">
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:text="Enter server address"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/ip_address"
+            style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/background"
+            android:backgroundTint="@color/neutral_200"
+            android:textCursorDrawable="@color/primary"
+            android:textColor="@color/black"
+            android:hint="IP address"
+            android:padding="16dp"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dialog_title" />
+
+        <Button
+            android:id="@+id/cancel_button"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_background_secondary"
+            android:text="@string/cancel"
+            android:textColor="@color/primary"
+            android:textSize="16sp"
+            app:backgroundTint="@color/neutral_300"
+            app:layout_constraintEnd_toStartOf="@+id/confirm_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ip_address" />
+
+        <Button
+            android:id="@+id/confirm_button"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background_primary"
+            android:text="@string/confirm"
+            android:textSize="16sp"
+            app:backgroundTint="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/cancel_button"
+            app:layout_constraintTop_toTopOf="@+id/cancel_button" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qwirkers.Utility.AvatarAdapter;
+import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
+import com.example.qwirkers.Utility.LobbyAvatarAdapter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -38,6 +42,8 @@ public class OfflineLobby extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.offline_lobby);
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+//        getActionBar().hide();
 
         numOfPlayers = Integer.parseInt(getIntent().getStringExtra(Home.PLAYERS_MESSAGE));
         playersAdded = 0;
@@ -45,18 +51,9 @@ public class OfflineLobby extends AppCompatActivity {
         players = new ArrayList<>();
 
         avatars = new ArrayList<>();
-        avatars.add(1);
-        avatars.add(2);
-        avatars.add(3);
-        avatars.add(4);
-        avatars.add(5);
-        avatars.add(6);
-        avatars.add(7);
-        avatars.add(8);
-        avatars.add(9);
-        avatars.add(10);
-        avatars.add(11);
-        avatars.add(12);
+        for (int i = 1; i <= 12; i++) {
+            avatars.add(i);
+        }
 
         avatarAdapter = new AvatarAdapter(this, avatars);
 
@@ -73,9 +70,7 @@ public class OfflineLobby extends AppCompatActivity {
         player_profile_selection.addItemDecoration(new EqualSpaceItemDecoration(5));
 
 
-
-        name_input = findViewById(R.id.input_field);
-
+        name_input = findViewById(R.id.ip_address);
 
         avatarAdapter.setOnClickListener(view -> {
             // Get view holder of the view.
@@ -100,14 +95,14 @@ public class OfflineLobby extends AppCompatActivity {
 
         playersAdded++;
 
-        if(playersAdded == numOfPlayers){
+        if (playersAdded == numOfPlayers) {
             Button play = findViewById(R.id.confirm_button);
 
             play.setText(R.string.play);
 
             play.setOnClickListener(v -> {
                 Intent intent = new Intent(this, GamePlay.class);
-                intent.putExtra(PLAYERS_MESSAGE, (Serializable) players);
+                intent.putExtra(PLAYERS_MESSAGE, players);
                 startActivity(intent);
             });
         }
@@ -125,7 +120,7 @@ public class OfflineLobby extends AppCompatActivity {
 
     public void startGame(View view) {
         Intent intent = new Intent(this, GamePlay.class);
-        intent.putExtra(PLAYERS_MESSAGE, (Serializable) players);
+        intent.putExtra(PLAYERS_MESSAGE, players);
         startActivity(intent);
     }
 }

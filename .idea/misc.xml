@@ -18,6 +18,7 @@
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/button_system.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/circle.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/done.xml" value="0.2" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_app_logo.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_bag.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_chevron_left.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_circle.xml" value="0.290625" />
@@ -28,6 +29,7 @@
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_done.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_empty.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_launcher_background.xml" value="0.290625" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.20260416666666667" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_menu.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_pass.xml" value="0.290625" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/drawable/ic_square.xml" value="0.290625" />
@@ -40,16 +42,25 @@
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/avatar_selection.xml" value="0.21041666666666667" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/board_block.xml" value="3.2" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/game_button.xml" value="1.0" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/game_mode.xml" value="0.5272536687631028" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/game_play.xml" value="0.264" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/game_tile.xml" value="0.8" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/game_tile_highlighted.xml" value="0.14375" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/home.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/ip_address_dialog.xml" value="0.27447916666666666" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/lobby_player.xml" value="0.536" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/offline_lobby.xml" value="0.264" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/player_card.xml" value="0.2616822429906542" />
-        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/player_count_dialog.xml" value="0.264" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/player_count_dialog.xml" value="0.5823170731707317" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/player_profile_selection.xml" value="0.72" />
         <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layout/trade_dialog.xml" value="0.264" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/activities/layout/game_mode.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/activities/layout/game_play.xml" value="0.14375" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/activities/layout/game_ranking.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/activities/layout/offline_lobby.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/activities/layout/online_lobby.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/components/layout/avatar_selection.xml" value="0.27447916666666666" />
+        <entry key="..\:/Users/craig/AndroidStudioProjects/Qwirkers/app/src/main/res/layouts/components/layout/player_card.xml" value="0.14375" />
       </map>
     </option>
   </component>

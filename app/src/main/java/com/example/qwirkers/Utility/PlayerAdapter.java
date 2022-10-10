@@ -1,4 +1,4 @@
-package com.example.qwirkers;
+package com.example.qwirkers.Utility;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,33 +8,45 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qwirkers.R;
+import com.google.android.material.card.MaterialCardView;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import QwirkleGame.Game.Player;
 
-public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.LobbyAvatarViewHolder> {
+public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
     private final List<Player> players;
     private final Context context;
+    private final List<PlayerViewHolder> viewHolderList;
+    private Player currentPlayer;
 
-    public LobbyAvatarAdapter(Context context, List<Player> players) {
-        this.players = players;
+    public PlayerAdapter(Context context, List<Player> players) {
         this.context = context;
+        this.players = players;
+        this.viewHolderList = new ArrayList<>();
     }
 
     @NonNull
     @Override
-    public LobbyAvatarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lobby_player, parent, false);
-        LobbyAvatarViewHolder vh = new LobbyAvatarViewHolder(view);
+    public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.player_card, parent, false);
+        PlayerViewHolder vh = new PlayerViewHolder(view);
+        viewHolderList.add(vh);
         return vh;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull LobbyAvatarViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlayerViewHolder holder, int position) {
         Player player = players.get(position);
         holder.setPlayer(player);
+
+        if(currentPlayer == player)
+            holder.highlight();
     }
 
     @Override
@@ -52,23 +64,50 @@ public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.
         notifyItemRemoved(position);
     }
 
-    public class LobbyAvatarViewHolder extends RecyclerView.ViewHolder {
-        public TextView playerName;
-        public ImageView playerProfile;
-        private Player player;
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
 
-        public LobbyAvatarViewHolder(@NonNull View view) {
+        highlightPlayer();
+    }
+
+    public void highlightPlayer() {
+        for(PlayerViewHolder vh : viewHolderList)
+            vh.highlight();
+    }
+
+    public class PlayerViewHolder extends RecyclerView.ViewHolder {
+        public MaterialCardView playerCard;
+        public TextView playerName;
+        public TextView playerPoints;
+        public ImageView playerProfile;
+        public TextView playerHand;
+        public Player player;
+
+        public PlayerViewHolder(@NonNull View view) {
             super(view);
 
-            playerName = view.findViewById(R.id.player_hand);
+            playerCard = view.findViewById(R.id.player_card);
+            playerName = view.findViewById(R.id.player_name);
+            playerPoints = view.findViewById(R.id.player_points);
             playerProfile = view.findViewById(R.id.playerProfile);
+            playerHand = view.findViewById(R.id.player_hand);
         }
 
         public void setPlayer(Player player) {
             this.player = player;
 
             playerName.setText(player.getName());
+            playerPoints.setText(String.valueOf(player.getPoints()));
+            playerHand.setText(String.valueOf(player.getHand().size()));
             playerProfile.setImageResource(setBlockImage(player.getProfileImg()));
+        }
+
+        public void highlight() {
+            if (currentPlayer == player) {
+                playerCard.setStrokeColor(ContextCompat.getColor(context, R.color.highlight));
+            } else {
+                playerCard.setStrokeColor(ContextCompat.getColor(context, R.color.transparent));
+            }
         }
 
         private int setBlockImage(int profileImg) {

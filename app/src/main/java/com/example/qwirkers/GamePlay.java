@@ -16,6 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qwirkers.Utility.BoardAdapter;
+import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
+import com.example.qwirkers.Utility.FunctionThread;
+import com.example.qwirkers.Utility.HandAdapter;
+import com.example.qwirkers.Utility.PlayerAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,18 +52,33 @@ public class GamePlay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_play);
 
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+//        getActionBar().hide();
+
         // getting players passed from the prev activity
         ArrayList<Player> players = (ArrayList<Player>) getIntent().getSerializableExtra(Home.PLAYERS_MESSAGE);
+
 
         // Game instance
         game = new Game(players);
 
-        // Tiles in the hands of the current player
+        // Start the game NOTE: optimal to use thread on this code section thread
+//        Runnable action = ()->{
+//            game.start();
+//            currentPlayer = game.getCurrentPlayer();
+//        };
+//
+//        FunctionThread thread = new FunctionThread(this, action);
+//        thread.start();
+
+        // Tiles in the hands of the current player NOTE: optimal to use thread on this code section thread
+
+        game.start();
         currentPlayer = game.getCurrentPlayer();
 
         validMoves = new ArrayList<>();
 
-        // region Instantiating the adapters
+        // region Instantiating the adapters NOTE: optimal to use thread on this code section thread
 
         playerAdapter = new PlayerAdapter(this, game.getPlayers());
         boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.getBoard(0));
@@ -68,7 +89,7 @@ public class GamePlay extends AppCompatActivity {
         // endregion
 
 
-        // region Players view setup
+        // region Players view setup NOTE: optimal to use thread on this code section thread
 
         playerAdapter.setCurrentPlayer(currentPlayer);
 
@@ -80,7 +101,7 @@ public class GamePlay extends AppCompatActivity {
         // endregion
 
 
-        // region Board view setup
+        // region Board view setup NOTE: optimal to use thread on this code section thread
 
         scrollView = findViewById(R.id.horizontalScrollView);
 
@@ -93,7 +114,7 @@ public class GamePlay extends AppCompatActivity {
         // endregion
 
 
-        // region Hand view setup
+        // region Hand view setup NOTE: optimal to use thread on this code section thread
 
         currentHand = findViewById(R.id.player_hand);
         currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -108,29 +129,31 @@ public class GamePlay extends AppCompatActivity {
 
         // Scroll to center of view
         scrollView.smoothScrollTo(boardUI.getLayoutParams().width / 2, 0);
-        boardUI.smoothScrollToPosition(Dimension.DIMX.getDim() * (Dimension.DIMX.getDim() / 2));
+        boardUI.smoothScrollToPosition((Dimension.DIMX.getDim() * Dimension.DIMY.getDim()) / 2);
+
+
 
         // on board block click event
         boardUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(GamePlay.this, String.valueOf(i), Toast.LENGTH_SHORT).show();
+
                 if (selectedTile == null) return;
 
                 if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
                     boardAdapter.notifyDataSetChanged();
 
                     // deselect all blocks on the board
-                    validMoves.clear();
-                    boardAdapter.highlightValidMoves(validMoves);
+                    validMoves.clear(); // NOTE: optimal to use thread on this code section thread
+                    boardAdapter.highlightValidMoves(validMoves); // NOTE: optimal to use thread on this code section thread
 
                     // deselect all tiles in hand
                     selectedTile = null;
-                    handAdapter.setSelectedTile(selectedTile);
+                    handAdapter.setSelectedTile(selectedTile); // NOTE: optimal to use thread on this code section thread
 
                     // remove tile from players hand
-                    currentPlayer.getHand().remove(selectedTile);
-                    handAdapter.notifyDataSetChanged();
-                    selectedTile = null;
+                     handAdapter.notifyDataSetChanged();
 
                     // update player card
                     playerAdapter.notifyDataSetChanged();
@@ -155,8 +178,10 @@ public class GamePlay extends AppCompatActivity {
             // Do something with the tile.
             handAdapter.setSelectedTile(selectedTile);
 
+
             validMoves = game.validMoves(selectedTile);
 
+            // TODO: Following code is slowing down app
             boardAdapter.highlightValidMoves(validMoves);
         });
     }
@@ -185,6 +210,8 @@ public class GamePlay extends AppCompatActivity {
     }
 
     public void trade(View view) {
+        //region Dialog Frame ## NOTE: optimal to use thread on this code section thread
+
         final Dialog dialog = new Dialog(this, R.style.MyDialog);
         //We have added a title in the custom layout. So let's disable the default title.
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -207,6 +234,11 @@ public class GamePlay extends AppCompatActivity {
         RecyclerView currentHand = dialog.findViewById(R.id.player_hand);
         RecyclerView tradeHand = dialog.findViewById(R.id.trade_in);
 
+        //endregion
+
+
+        // region Current player's hand ## NOTE: optimal to use thread on this code section thread
+
         HandAdapter handAdapter_ = new HandAdapter(this, currentPlayer.getHand());
         currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         currentHand.setAdapter(handAdapter_);
@@ -214,7 +246,11 @@ public class GamePlay extends AppCompatActivity {
         currentHand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
         currentHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
 
-        // view for the tiles being traded in
+        // endregion
+
+
+        // region Trade in tiles ## NOTE: optimal to use thread on this code section thread
+
         HandAdapter tradeAdapter_ = new HandAdapter(this, tradeTiles);
         tradeHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         tradeHand.setAdapter(tradeAdapter_);
@@ -222,31 +258,41 @@ public class GamePlay extends AppCompatActivity {
         tradeHand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
         tradeHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
 
+        // endregion
 
         handAdapter_.setOnClickListener(v -> {
-            // Get view holder of the view.
-            HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) currentHand.findContainingViewHolder(v);
+            try {
+                // Get view holder of the view.
+                HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) currentHand.findContainingViewHolder(v);
 
-            // Get the tile from the view holder
-            Tile tile = viewHolder.tile;
+                // Get the tile from the view holder
+                Tile tile = viewHolder.tile;
 
-            tradeAdapter_.add(tile);
-            handAdapter_.remove(tile);
+                handAdapter_.remove(tile); // NOTE: optimal to use thread on this code section thread
+                tradeAdapter_.add(tile); // NOTE: optimal to use thread on this code section thread
 
-            cleanup();
+                cleanup();
+            } catch (Exception e) {
+                return;
+            }
         });
 
         tradeAdapter_.setOnClickListener(v -> {
-            // Get view holder of the view.
-            HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) tradeHand.findContainingViewHolder(v);
+            try {
+                // Get view holder of the view.
+                HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) tradeHand.findContainingViewHolder(v);
 
-            // Get the tile from the view holder
-            Tile tile = viewHolder.tile;
+                // Get the tile from the view holder
+                Tile tile = viewHolder.tile;
 
-            handAdapter_.add(tile);
-            tradeAdapter_.remove(tile);
+                tradeAdapter_.remove(tile); // NOTE: optimal to use thread on this code section thread
+                handAdapter_.add(tile); // NOTE: optimal to use thread on this code section thread
 
-            cleanup();
+                cleanup();
+
+            } catch (Exception e) {
+                return;
+            }
         });
 
 

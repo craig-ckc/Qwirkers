@@ -17,18 +17,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Home extends AppCompatActivity {
+public class GameMode extends AppCompatActivity {
     public static String PLAYERS_MESSAGE = "Players";
-    @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home);
+        setContentView(R.layout.game_mode);
 
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-//        getActionBar().hide();
     }
 
-    public void showDialog(View view) {
+    public void playOffline(View view) {
         final Dialog dialog = new Dialog (this, R.style.MyDialog);
         //We have added a title in the custom layout. So let's disable the default title.
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -64,7 +62,7 @@ public class Home extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Home.this, OfflineLobby.class);
+                Intent intent = new Intent(GameMode.this, OfflineLobby.class);
                 intent.putExtra(PLAYERS_MESSAGE, spinner.getSelectedItem().toString());
                 startActivity(intent);
                 dialog.dismiss();
@@ -81,8 +79,46 @@ public class Home extends AppCompatActivity {
         dialog.show();
     }
 
-    public void gameMode(View view) {
-        Intent intent = new Intent(Home.this, GameMode.class);
-        startActivity(intent);
+    public void playOnline(View view) {
+        final Dialog dialog = new Dialog (this, R.style.MyDialog);
+        //We have added a title in the custom layout. So let's disable the default title.
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //The user will be able to cancel the dialog bu clicking anywhere outside the dialog.
+        dialog.setCancelable(true);
+        //Mention the name of the layout of your custom dialog.
+        dialog.setContentView(R.layout.ip_address_dialog);
+
+        dialog.setCanceledOnTouchOutside(true);
+
+        EditText input = dialog.findViewById(R.id.ip_address);
+
+        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+        lp.dimAmount=0.5f;
+        lp.gravity = Gravity.BOTTOM;
+        dialog.getWindow().setAttributes(lp);
+
+        Button cancelButton = dialog.findViewById(R.id.cancel_button);
+        Button confirmButton = dialog.findViewById(R.id.confirm_button);
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GameMode.this, OnlineLobby.class);
+                intent.putExtra(PLAYERS_MESSAGE, input.getText().toString());
+                startActivity(intent);
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 }

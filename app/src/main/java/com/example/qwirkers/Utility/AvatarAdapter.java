@@ -1,4 +1,4 @@
-package com.example.qwirkers;
+package com.example.qwirkers.Utility;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.qwirkers.R;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -25,6 +26,13 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarView
     public AvatarAdapter(Context context, List<Integer> avatars) {
         this.context = context;
         this.avatars = avatars;
+        this.viewHolderList = new ArrayList<>();
+    }
+
+    public AvatarAdapter(Context context, List<Integer> avatars, int currentAvatar) {
+        this.context = context;
+        this.avatars = avatars;
+        this.currentAvatar = currentAvatar;
         this.viewHolderList = new ArrayList<>();
     }
 
@@ -80,6 +88,8 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarView
             this.avatarInt = avatarInt;
 
             avatar.setImageResource(setBlockImage(avatarInt));
+
+            highlight();
         }
 
         public void highlight() {
