@@ -1,10 +1,10 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import QwirkleGame.Enums.Dimension;
-import QwirkleGame.Enums.Direction;
+import Game.Enums.Dimension;
+import Game.Enums.Direction;
 
 public class Rules {
     private static final int MAXLINELENGHT = 6;

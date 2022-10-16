@@ -1,4 +1,4 @@
-package QwirkleGame.Enums;
+package Game.Enums;
 
 public enum Dimension {
     DIMX(30), DIMY(30), TILESIZE(100);

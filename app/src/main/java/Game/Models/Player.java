@@ -1,4 +1,4 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;

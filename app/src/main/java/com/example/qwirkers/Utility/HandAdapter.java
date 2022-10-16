@@ -18,10 +18,10 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.List;
 
-import QwirkleGame.Enums.Color;
-import QwirkleGame.Enums.Dimension;
-import QwirkleGame.Enums.Shape;
-import QwirkleGame.Game.Tile;
+import Game.Enums.Color;
+import Game.Enums.Dimension;
+import Game.Enums.Shape;
+import Game.Models.Tile;
 
 public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder> {
     private final Context context;

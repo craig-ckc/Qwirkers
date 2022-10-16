@@ -94,6 +94,7 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/button_background_secondary"
+                    android:onClick="cancel"
                     android:text="@string/cancel"
                     android:textColor="@color/primary"
                     android:textSize="16sp"

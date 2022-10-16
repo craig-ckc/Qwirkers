@@ -1,5 +1,9 @@
 package com.example.qwirkers;
 
+import static com.example.qwirkers.Utility.ActivityKey.SHEARED_PREF;
+import static com.example.qwirkers.Utility.ActivityKey.USER_NAME;
+import static com.example.qwirkers.Utility.ActivityKey.USER_AVATAR;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,32 +19,29 @@ import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
 
 import java.util.ArrayList;
 
+import Server.ClientHandler;
+import Server.GameClient;
+
 public class OnlineLobby extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private EditText input;
 
     private AvatarAdapter avatarAdapter;
-
     private int avatar;
-
     private RecyclerView player_profile_selection;
-
-    private final String USER_NAME = "USER_NAME";
-    private final String USER_AVATAR = "USER_AVATAR";
+    private GameClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.online_lobby);
 
+        client = ClientHandler.getClient();
         input = findViewById(R.id.username);
-
-        sharedPref = getPreferences(MODE_PRIVATE);
-
-        String username = sharedPref.getString(USER_NAME, "");
+        sharedPref = getSharedPreferences(SHEARED_PREF, MODE_PRIVATE);
 
         if(sharedPref.contains(USER_NAME)){
-            input.setText(username);
+            input.setText(sharedPref.getString(USER_NAME, ""));
             avatar = sharedPref.getInt(USER_AVATAR, -1);
         }
 
@@ -76,9 +77,12 @@ public class OnlineLobby extends AppCompatActivity {
             editor.putInt(USER_AVATAR, avatar);
             editor.apply();
         }
+
+        client.ready(sharedPref.getString(USER_NAME, "Hero"), sharedPref.getInt(USER_AVATAR, -1));
     }
 
     public void cancel(View view) {
+        client.disconnect();
         finish();
     }
 

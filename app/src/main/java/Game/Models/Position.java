@@ -1,4 +1,4 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 public class Position implements Comparable<Position>{
 	private final int x;

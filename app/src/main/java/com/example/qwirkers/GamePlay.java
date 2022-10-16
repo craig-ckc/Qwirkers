@@ -18,18 +18,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qwirkers.Utility.BoardAdapter;
 import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
-import com.example.qwirkers.Utility.FunctionThread;
 import com.example.qwirkers.Utility.HandAdapter;
 import com.example.qwirkers.Utility.PlayerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import QwirkleGame.Enums.Dimension;
-import QwirkleGame.Game.Game;
-import QwirkleGame.Game.Player;
-import QwirkleGame.Game.Position;
-import QwirkleGame.Game.Tile;
+import Game.Enums.Dimension;
+import Game.Models.OnlineGame;
+import Game.Models.Player;
+import Game.Models.Position;
+import Game.Models.Tile;
 
 public class GamePlay extends AppCompatActivity {
     private PlayerAdapter playerAdapter;
@@ -39,7 +38,7 @@ public class GamePlay extends AppCompatActivity {
     private List<Position> validMoves;
     private Tile selectedTile;
     private Player currentPlayer;
-    private Game game;
+    private OnlineGame game;
     private List<Tile> tradeTiles;
 
     private RecyclerView currentHand;
@@ -52,26 +51,12 @@ public class GamePlay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_play);
 
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-//        getActionBar().hide();
-
         // getting players passed from the prev activity
         ArrayList<Player> players = (ArrayList<Player>) getIntent().getSerializableExtra(Home.PLAYERS_MESSAGE);
 
 
         // Game instance
-        game = new Game(players);
-
-        // Start the game NOTE: optimal to use thread on this code section thread
-//        Runnable action = ()->{
-//            game.start();
-//            currentPlayer = game.getCurrentPlayer();
-//        };
-//
-//        FunctionThread thread = new FunctionThread(this, action);
-//        thread.start();
-
-        // Tiles in the hands of the current player NOTE: optimal to use thread on this code section thread
+        game = new OnlineGame(players);
 
         game.start();
         currentPlayer = game.getCurrentPlayer();
@@ -87,7 +72,6 @@ public class GamePlay extends AppCompatActivity {
         tradeTiles = new ArrayList<>();
 
         // endregion
-
 
         // region Players view setup NOTE: optimal to use thread on this code section thread
 
@@ -131,8 +115,6 @@ public class GamePlay extends AppCompatActivity {
         scrollView.smoothScrollTo(boardUI.getLayoutParams().width / 2, 0);
         boardUI.smoothScrollToPosition((Dimension.DIMX.getDim() * Dimension.DIMY.getDim()) / 2);
 
-
-
         // on board block click event
         boardUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -145,15 +127,15 @@ public class GamePlay extends AppCompatActivity {
                     boardAdapter.notifyDataSetChanged();
 
                     // deselect all blocks on the board
-                    validMoves.clear(); // NOTE: optimal to use thread on this code section thread
-                    boardAdapter.highlightValidMoves(validMoves); // NOTE: optimal to use thread on this code section thread
+                    validMoves.clear();
+                    boardAdapter.highlightValidMoves(validMoves);
+
+                    // remove tile from players hand
+                    handAdapter.remove(selectedTile);
 
                     // deselect all tiles in hand
                     selectedTile = null;
-                    handAdapter.setSelectedTile(selectedTile); // NOTE: optimal to use thread on this code section thread
-
-                    // remove tile from players hand
-                     handAdapter.notifyDataSetChanged();
+                    handAdapter.setSelectedTile(selectedTile);
 
                     // update player card
                     playerAdapter.notifyDataSetChanged();

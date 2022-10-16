@@ -1,4 +1,4 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 public class Move {
     private final Tile tile;

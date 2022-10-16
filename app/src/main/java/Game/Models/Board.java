@@ -1,11 +1,11 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import QwirkleGame.Enums.Dimension;
+import Game.Enums.Dimension;
 
 public class Board {
     private Map<Position, Tile> board;

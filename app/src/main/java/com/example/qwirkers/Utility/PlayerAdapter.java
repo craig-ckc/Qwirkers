@@ -17,7 +17,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.List;
 
-import QwirkleGame.Game.Player;
+import Game.Models.Player;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
     private final List<Player> players;

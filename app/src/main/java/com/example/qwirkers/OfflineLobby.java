@@ -15,10 +15,9 @@ import com.example.qwirkers.Utility.AvatarAdapter;
 import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
 import com.example.qwirkers.Utility.LobbyAvatarAdapter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-import QwirkleGame.Game.Player;
+import Game.Models.Player;
 
 public class OfflineLobby extends AppCompatActivity {
     public static String PLAYERS_MESSAGE = "Players";
@@ -42,8 +41,6 @@ public class OfflineLobby extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.offline_lobby);
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-//        getActionBar().hide();
 
         numOfPlayers = Integer.parseInt(getIntent().getStringExtra(Home.PLAYERS_MESSAGE));
         playersAdded = 0;

@@ -1,11 +1,11 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Game implements Serializable {
+public class OnlineGame implements Serializable {
     private Board board;
     private Rules rules;
     private Player currentPlayer;
@@ -14,7 +14,7 @@ public class Game implements Serializable {
     private List<Move> moves;
     private int playerCount; // helper number to change the players
 
-    public Game(List<Player> players) {
+    public OnlineGame(List<Player> players) {
         this.players = players;
         this.moves = new ArrayList<>();
     }

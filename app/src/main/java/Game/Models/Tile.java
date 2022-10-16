@@ -1,7 +1,7 @@
-package QwirkleGame.Game;
+package Game.Models;
 
-import QwirkleGame.Enums.Color;
-import QwirkleGame.Enums.Shape;
+import Game.Enums.Color;
+import Game.Enums.Shape;
 
 public class Tile {
     private final Shape shape;

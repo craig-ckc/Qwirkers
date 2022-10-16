@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import QwirkleGame.Enums.Color;
-import QwirkleGame.Enums.Dimension;
-import QwirkleGame.Enums.Shape;
-import QwirkleGame.Game.Position;
-import QwirkleGame.Game.Tile;
+import Game.Enums.Color;
+import Game.Enums.Dimension;
+import Game.Enums.Shape;
+import Game.Models.Position;
+import Game.Models.Tile;
 
 public class BoardAdapter extends ArrayAdapter<Tile> {
     private final Context context;

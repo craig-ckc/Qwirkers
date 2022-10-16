@@ -1,11 +1,11 @@
-package QwirkleGame.Game;
+package Game.Models;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import QwirkleGame.Enums.Color;
-import QwirkleGame.Enums.Shape;
+import Game.Enums.Color;
+import Game.Enums.Shape;
 
 public class Bag {
     private static final int SETS = 3;

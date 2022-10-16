@@ -14,7 +14,7 @@ import com.example.qwirkers.R;
 
 import java.util.List;
 
-import QwirkleGame.Game.Player;
+import Game.Models.Player;
 
 public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.LobbyAvatarViewHolder> {
     private final List<Player> players;
