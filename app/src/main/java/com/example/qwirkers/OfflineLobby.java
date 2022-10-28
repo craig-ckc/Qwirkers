@@ -1,5 +1,8 @@
 package com.example.qwirkers;
 
+import static com.example.qwirkers.Utility.Utilities.PLAYER_COUNT;
+import static com.example.qwirkers.Utility.Utilities.PLAYER_LIST;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,8 +23,6 @@ import java.util.ArrayList;
 import Game.Models.Player;
 
 public class OfflineLobby extends AppCompatActivity {
-    public static String PLAYERS_MESSAGE = "Players";
-
     private AvatarAdapter avatarAdapter;
     private LobbyAvatarAdapter lobbyAvatarAdapter;
 
@@ -42,7 +43,7 @@ public class OfflineLobby extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.offline_lobby);
 
-        numOfPlayers = Integer.parseInt(getIntent().getStringExtra(Home.PLAYERS_MESSAGE));
+        numOfPlayers = Integer.parseInt(getIntent().getStringExtra(PLAYER_COUNT));
         playersAdded = 0;
 
         players = new ArrayList<>();
@@ -98,8 +99,8 @@ public class OfflineLobby extends AppCompatActivity {
             play.setText(R.string.play);
 
             play.setOnClickListener(v -> {
-                Intent intent = new Intent(this, GamePlay.class);
-                intent.putExtra(PLAYERS_MESSAGE, players);
+                Intent intent = new Intent(this, OfflineGame.class);
+                intent.putExtra(PLAYER_LIST, players);
                 startActivity(intent);
             });
         }
@@ -116,8 +117,8 @@ public class OfflineLobby extends AppCompatActivity {
     }
 
     public void startGame(View view) {
-        Intent intent = new Intent(this, GamePlay.class);
-        intent.putExtra(PLAYERS_MESSAGE, players);
+        Intent intent = new Intent(this, OfflineGame.class);
+        intent.putExtra(PLAYER_LIST, players);
         startActivity(intent);
     }
 }

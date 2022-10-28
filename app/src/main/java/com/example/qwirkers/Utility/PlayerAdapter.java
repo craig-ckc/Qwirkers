@@ -31,6 +31,14 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         this.viewHolderList = new ArrayList<>();
     }
 
+    public PlayerAdapter(Context context, List<Player> players, Player currentPlayer) {
+        this.context = context;
+        this.players = players;
+        setCurrentPlayer(currentPlayer);
+
+        this.viewHolderList = new ArrayList<>();
+    }
+
     @NonNull
     @Override
     public PlayerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,7 +74,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
-
         highlightPlayer();
     }
 

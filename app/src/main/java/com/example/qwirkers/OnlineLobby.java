@@ -1,17 +1,23 @@
 package com.example.qwirkers;
 
-import static com.example.qwirkers.Utility.ActivityKey.SHEARED_PREF;
-import static com.example.qwirkers.Utility.ActivityKey.USER_NAME;
-import static com.example.qwirkers.Utility.ActivityKey.USER_AVATAR;
+import static com.example.qwirkers.Utility.Utilities.SERVER_ADDRESS;
+import static com.example.qwirkers.Utility.Utilities.SHEARED_PREF;
+import static com.example.qwirkers.Utility.Utilities.USER_AVATAR;
+import static com.example.qwirkers.Utility.Utilities.USER_NAME;
+import static com.example.qwirkers.Utility.Utilities.createDialog;
 
-import android.content.Context;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qwirkers.Utility.AvatarAdapter;
@@ -19,28 +25,24 @@ import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
 
 import java.util.ArrayList;
 
-import Server.ClientHandler;
-import Server.GameClient;
 
 public class OnlineLobby extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private EditText input;
 
     private AvatarAdapter avatarAdapter;
+    private RecyclerView avatarSelection;
     private int avatar;
-    private RecyclerView player_profile_selection;
-    private GameClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.online_lobby);
 
-        client = ClientHandler.getClient();
         input = findViewById(R.id.username);
         sharedPref = getSharedPreferences(SHEARED_PREF, MODE_PRIVATE);
 
-        if(sharedPref.contains(USER_NAME)){
+        if (sharedPref.contains(USER_NAME)) {
             input.setText(sharedPref.getString(USER_NAME, ""));
             avatar = sharedPref.getInt(USER_AVATAR, -1);
         }
@@ -52,41 +54,83 @@ public class OnlineLobby extends AppCompatActivity {
 
         avatarAdapter = new AvatarAdapter(this, avatars, avatar);
 
-        player_profile_selection = findViewById(R.id.player_profile_selection);
-        player_profile_selection.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
-        player_profile_selection.setAdapter(avatarAdapter);
-        player_profile_selection.addItemDecoration(new EqualSpaceItemDecoration(5));
+        avatarSelection = findViewById(R.id.player_profile_selection);
+        avatarSelection.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+        avatarSelection.setAdapter(avatarAdapter);
+        avatarSelection.addItemDecoration(new EqualSpaceItemDecoration(5));
 
         avatarAdapter.setOnClickListener(view -> {
             // Get view holder of the view.
-            AvatarAdapter.AvatarViewHolder viewHolder = (AvatarAdapter.AvatarViewHolder) player_profile_selection.findContainingViewHolder(view);
-            if (avatar == viewHolder.avatarInt) {
+            AvatarAdapter.AvatarViewHolder viewHolder = (AvatarAdapter.AvatarViewHolder) avatarSelection.findContainingViewHolder(view);
+            if (avatar == viewHolder.avatarInt)
                 avatar = -1;
-            } else {
+            else
                 avatar = viewHolder.avatarInt;
-            }
 
             avatarAdapter.setCurrentAvatar(avatar);
         });
     }
 
+    public void cancel(View view) {
+        finish();
+    }
+
     public void confirm(View view) {
-        if(!sharedPref.contains(USER_NAME) || !input.getText().toString().equals(sharedPref.getString(USER_NAME, "")) || avatar != sharedPref.getInt(USER_AVATAR, -1)){
+        final Dialog dialog = createDialog(OnlineLobby.this, R.layout.ip_address_dialog, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        EditText ipAddress = dialog.findViewById(R.id.ip_address);
+        Button cancelButton = dialog.findViewById(R.id.cancel_button);
+        Button confirmButton = dialog.findViewById(R.id.confirm_button);
+
+        ipAddress.setText(sharedPref.getString(SERVER_ADDRESS, ""));
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String serverAddress = ipAddress.getText().toString();
+
+                if (!sharedPref.contains(SERVER_ADDRESS) || !serverAddress.equals(sharedPref.getString(SERVER_ADDRESS, ""))) {
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(USER_NAME, input.getText().toString());
+                    editor.putInt(USER_AVATAR, avatar);
+                    editor.apply();
+                }
+
+                Intent intent = new Intent(OnlineLobby.this, OnlineGame.class);
+                intent.putExtra(SERVER_ADDRESS, serverAddress);
+                startActivity(intent);
+
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    /* Decrepit */
+    public void _confirm(View view) {
+        if (!sharedPref.contains(USER_NAME) || !input.getText().toString().equals(sharedPref.getString(USER_NAME, "")) || avatar != sharedPref.getInt(USER_AVATAR, -1)) {
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(USER_NAME, input.getText().toString());
             editor.putInt(USER_AVATAR, avatar);
             editor.apply();
         }
 
-        client.ready(sharedPref.getString(USER_NAME, "Hero"), sharedPref.getInt(USER_AVATAR, -1));
+        Dialog dialog = createDialog(OnlineLobby.this, R.layout.online_lobby_modal, WindowManager.LayoutParams.WRAP_CONTENT);
+
+        RecyclerView waiting_players = dialog.findViewById(R.id.waiting_players);
+        waiting_players.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        // waiting_players.setAdapter(lobbyAvatarAdapter);
+        waiting_players.addItemDecoration(new EqualSpaceItemDecoration(5));
+
+
+        dialog.show();
     }
 
-    public void cancel(View view) {
-        client.disconnect();
-        finish();
-    }
-
-    public void quite(View view) {
-        
-    }
 }

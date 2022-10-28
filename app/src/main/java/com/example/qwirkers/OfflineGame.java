@@ -1,14 +1,15 @@
 package com.example.qwirkers;
 
+import static com.example.qwirkers.Utility.Utilities.PLAYER_LIST;
+import static com.example.qwirkers.Utility.Utilities.createDialog;
+
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.HorizontalScrollView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,102 +26,93 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Game.Enums.Dimension;
-import Game.Models.OnlineGame;
+import Game.Models.GameOffline;
 import Game.Models.Player;
 import Game.Models.Position;
 import Game.Models.Tile;
 
-public class GamePlay extends AppCompatActivity {
+public class OfflineGame extends AppCompatActivity {
+    private RecyclerView hand;
+    private GridView board;
+    private RecyclerView players;
+    private Button bag;
+
     private PlayerAdapter playerAdapter;
     private BoardAdapter boardAdapter;
     private HandAdapter handAdapter;
 
-    private List<Position> validMoves;
-    private Tile selectedTile;
+    private GameOffline game;
     private Player currentPlayer;
-    private OnlineGame game;
+    private Tile selectedTile;
+    private List<Position> validMoves;
     private List<Tile> tradeTiles;
-
-    private RecyclerView currentHand;
-    private GridView boardUI;
-    private HorizontalScrollView scrollView;
-    private Button bag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game_play);
+        setContentView(R.layout.offline_game);
 
         // getting players passed from the prev activity
-        ArrayList<Player> players = (ArrayList<Player>) getIntent().getSerializableExtra(Home.PLAYERS_MESSAGE);
-
+        ArrayList<Player> playerList = (ArrayList<Player>) getIntent().getSerializableExtra(PLAYER_LIST);
 
         // Game instance
-        game = new OnlineGame(players);
-
+        game = new GameOffline(playerList);
         game.start();
         currentPlayer = game.getCurrentPlayer();
 
+        // region Helper arrays
+
         validMoves = new ArrayList<>();
-
-        // region Instantiating the adapters NOTE: optimal to use thread on this code section thread
-
-        playerAdapter = new PlayerAdapter(this, game.getPlayers());
-        boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.getBoard(0));
-        handAdapter = new HandAdapter(this, currentPlayer.getHand());
-        bag = findViewById(R.id.bag);
         tradeTiles = new ArrayList<>();
 
         // endregion
 
-        // region Players view setup NOTE: optimal to use thread on this code section thread
+        // region Hand view and adapter
 
+        hand = findViewById(R.id.player_hand);
+        hand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        hand.addItemDecoration(new EqualSpaceItemDecoration(5));
+        hand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
+        hand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 6.6));
+
+        handAdapter = new HandAdapter(this, currentPlayer.getHand());
+        hand.setAdapter(handAdapter);
+
+        // endregion
+
+        // region Board view and adapter
+
+        board = findViewById(R.id.game_board);
+        board.getLayoutParams().width = (Dimension.TILESIZE.getDim() * (Dimension.DIMX.getDim() + 1));
+        board.requestLayout();
+        board.setColumnWidth(Dimension.TILESIZE.getDim());
+
+        boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.getBoard(0));
+        board.setAdapter(boardAdapter);
+
+        // endregion
+
+        // region Players view and adapter
+        players = findViewById(R.id.players);
+        players.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
+        players.addItemDecoration(new EqualSpaceItemDecoration(5));
+
+        playerAdapter = new PlayerAdapter(this, game.getPlayers());
         playerAdapter.setCurrentPlayer(currentPlayer);
-
-        RecyclerView playersUI = findViewById(R.id.players);
-        playersUI.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
-        playersUI.setAdapter(playerAdapter);
-        playersUI.addItemDecoration(new EqualSpaceItemDecoration(5));
+        players.setAdapter(playerAdapter);
 
         // endregion
 
+        // region Bag button view
 
-        // region Board view setup NOTE: optimal to use thread on this code section thread
-
-        scrollView = findViewById(R.id.horizontalScrollView);
-
-        boardUI = findViewById(R.id.game_board);
-        boardUI.getLayoutParams().width = (Dimension.TILESIZE.getDim() * (Dimension.DIMX.getDim() + 1));
-        boardUI.requestLayout();
-        boardUI.setColumnWidth(Dimension.TILESIZE.getDim());
-        boardUI.setAdapter(boardAdapter);
-
-        // endregion
-
-
-        // region Hand view setup NOTE: optimal to use thread on this code section thread
-
-        currentHand = findViewById(R.id.player_hand);
-        currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        currentHand.setAdapter(handAdapter);
-        currentHand.addItemDecoration(new EqualSpaceItemDecoration(5));
-        currentHand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
-        currentHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
-
-        // endregion
-
+        bag = findViewById(R.id.bag);
         bag.setText(String.valueOf(game.getBagSize()));
 
-        // Scroll to center of view
-        scrollView.smoothScrollTo(boardUI.getLayoutParams().width / 2, 0);
-        boardUI.smoothScrollToPosition((Dimension.DIMX.getDim() * Dimension.DIMY.getDim()) / 2);
+        // endregion
 
-        // on board block click event
-        boardUI.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        board.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(GamePlay.this, String.valueOf(i), Toast.LENGTH_SHORT).show();
-
                 if (selectedTile == null) return;
 
                 if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
@@ -130,27 +122,28 @@ public class GamePlay extends AppCompatActivity {
                     validMoves.clear();
                     boardAdapter.highlightValidMoves(validMoves);
 
-                    // remove tile from players hand
-                    handAdapter.remove(selectedTile);
-
                     // deselect all tiles in hand
                     selectedTile = null;
-                    handAdapter.setSelectedTile(selectedTile);
+                    handAdapter.highlight(selectedTile);
+
+//                    board.getLayoutParams().width = (Dimension.TILESIZE.getDim() * (offlineGame.getBoardWidth() + 1));
+
+                    handAdapter.notifyDataSetChanged();
 
                     // update player card
                     playerAdapter.notifyDataSetChanged();
+
                 }
             }
         });
 
-        // in hand tile click event
         handAdapter.setOnClickListener(view -> {
             // Get view holder of the view.
-            HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) currentHand.findContainingViewHolder(view);
+            HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) hand.findContainingViewHolder(view);
 
             if (selectedTile == viewHolder.tile) {
                 selectedTile = null;
-                handAdapter.setSelectedTile(null);
+                handAdapter.highlight(null);
                 return;
             }
 
@@ -158,8 +151,7 @@ public class GamePlay extends AppCompatActivity {
             selectedTile = viewHolder.tile;
 
             // Do something with the tile.
-            handAdapter.setSelectedTile(selectedTile);
-
+            handAdapter.highlight(selectedTile);
 
             validMoves = game.validMoves(selectedTile);
 
@@ -176,7 +168,6 @@ public class GamePlay extends AppCompatActivity {
         handAdapter.setTiles(currentPlayer.getHand());
 
         cleanup();
-
     }
 
     public void undo(View view) {
@@ -192,53 +183,61 @@ public class GamePlay extends AppCompatActivity {
     }
 
     public void trade(View view) {
-        //region Dialog Frame ## NOTE: optimal to use thread on this code section thread
+        final Dialog dialog = createDialog(OfflineGame.this, R.layout.trade_dialog, WindowManager.LayoutParams.MATCH_PARENT);
 
-        final Dialog dialog = new Dialog(this, R.style.MyDialog);
-        //We have added a title in the custom layout. So let's disable the default title.
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //The user will be able to cancel the dialog bu clicking anywhere outside the dialog.
-        dialog.setCancelable(true);
-        //Mention the name of the layout of your custom dialog.
-        dialog.setContentView(R.layout.trade_dialog);
-
-        dialog.setCanceledOnTouchOutside(true);
-
-        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-
-        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
-        lp.dimAmount = 0.7f;
-        dialog.getWindow().setAttributes(lp);
+        // region Trade Button
 
         Button tradeButton = dialog.findViewById(R.id.trade);
+
+        tradeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                game.trade(tradeTiles);
+                tradeTiles.clear();
+                cleanup();
+                dialog.dismiss();
+            }
+        });
+
+        // endregion
+
+        // region Cancel Button
+
         Button cancelButton = dialog.findViewById(R.id.cancel);
 
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handAdapter.add(tradeTiles);
+                tradeTiles.clear();
+                cleanup();
+                dialog.dismiss();
+            }
+        });
+
+        // endregion
+
+        // region Current Hand: tile that are still in your hand that will not be traded
+
         RecyclerView currentHand = dialog.findViewById(R.id.player_hand);
-        RecyclerView tradeHand = dialog.findViewById(R.id.trade_in);
-
-        //endregion
-
-
-        // region Current player's hand ## NOTE: optimal to use thread on this code section thread
-
         HandAdapter handAdapter_ = new HandAdapter(this, currentPlayer.getHand());
         currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         currentHand.setAdapter(handAdapter_);
         currentHand.addItemDecoration(new EqualSpaceItemDecoration(5));
         currentHand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
-        currentHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
+        currentHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 6.6));
 
         // endregion
 
+        // region Trade Hand: tile that you will be trading in from your hand
 
-        // region Trade in tiles ## NOTE: optimal to use thread on this code section thread
-
+        RecyclerView tradeHand = dialog.findViewById(R.id.trade_in);
         HandAdapter tradeAdapter_ = new HandAdapter(this, tradeTiles);
         tradeHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         tradeHand.setAdapter(tradeAdapter_);
         tradeHand.addItemDecoration(new EqualSpaceItemDecoration(5));
         tradeHand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
-        tradeHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
+        tradeHand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 6.6));
 
         // endregion
 
@@ -277,27 +276,6 @@ public class GamePlay extends AppCompatActivity {
             }
         });
 
-
-        tradeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                game.trade(tradeTiles);
-                tradeTiles.clear();
-                cleanup();
-                dialog.dismiss();
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handAdapter.add(tradeTiles);
-                tradeTiles.clear();
-                cleanup();
-                dialog.dismiss();
-            }
-        });
-
         dialog.show();
     }
 
@@ -321,11 +299,12 @@ public class GamePlay extends AppCompatActivity {
 
         // deselect all tiles in hand
         selectedTile = null;
-        handAdapter.setSelectedTile(selectedTile);
+        handAdapter.highlight(selectedTile);
 
         bag.setText(String.valueOf(game.getBagSize()));
 
         boardAdapter.notifyDataSetChanged();
+
         handAdapter.notifyDataSetChanged();
         playerAdapter.notifyDataSetChanged();
     }

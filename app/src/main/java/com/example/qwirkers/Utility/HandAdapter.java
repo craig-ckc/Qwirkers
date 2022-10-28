@@ -28,7 +28,6 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
     private final List<TileViewHolder> viewHolderList;
     private View.OnClickListener onClickListener;
     private List<Tile> tiles;
-    private Tile selectedTile;
 
     public HandAdapter(Context context, List<Tile> tiles) {
         this.context = context;
@@ -72,6 +71,10 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
         }
     }
 
+    public void setTiles(List<Tile> tiles) {
+        this.tiles = tiles;
+    }
+
     public void remove(int position) {
         tiles.remove(position);
         notifyItemRemoved(position);
@@ -87,34 +90,9 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
         }
     }
 
-    public Tile get(int position) {
-        return tiles.get(position);
-    }
-
-    public void setSelectedTile(Tile selectedTile) {
-        this.selectedTile = selectedTile;
-
-        highlightTile();
-    }
-
-    public void highlightTile() {
+    public void highlight(Tile selectedTile) {
         for(TileViewHolder vh : viewHolderList)
-            vh.highlight();
-    }
-
-    public void setTiles(List<Tile> tiles) {
-        this.tiles.clear();
-
-        for(Tile tile : tiles){
-            add(tile);
-        }
-
-
-//        notifyDataSetChanged();
-    }
-
-    public List<TileViewHolder> getViewHolderList() {
-        return viewHolderList;
+            vh.highlight(selectedTile);
     }
 
     public class TileViewHolder extends RecyclerView.ViewHolder {
@@ -131,8 +109,14 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
 
         public void setTile(Tile tile) {
             this.tile = tile;
+
+            // setting the size of the tile
             tileImage.setLayoutParams(new LinearLayout.LayoutParams(Dimension.TILESIZE.getDim(), Dimension.TILESIZE.getDim()));
+
+            // setting the shape of the tile
             tileImage.setImageResource(getTile(tile.getShape()));
+
+            // setting the color of the shape
             tileImage.setColorFilter(getColor(tile.getColor()), PorterDuff.Mode.SRC_IN);
         }
 
@@ -174,7 +158,7 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
             }
         }
 
-        public void highlight() {
+        public void highlight(Tile selectedTile) {
             if (selectedTile == tile) {
                 itemView.setStrokeColor(ContextCompat.getColor(context, R.color.highlight));
             } else {
@@ -182,4 +166,5 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
             }
         }
     }
+
 }

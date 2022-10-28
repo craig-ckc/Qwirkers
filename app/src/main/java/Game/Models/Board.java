@@ -8,14 +8,22 @@ import java.util.TreeMap;
 import Game.Enums.Dimension;
 
 public class Board {
-    private Map<Position, Tile> board;
-    private List<Position> filledBlocks;
+    private final Map<Position, Tile> board;
+    private final List<Position> filledBlocks;
     private boolean empty;
     private int count;
 
+    private int top;
+    private int bottom;
+    private int left;
+    private int right;
+
+    private int height;
+    private int width;
+
     public Board() {
         board = new TreeMap<>();
-        filledBlocks = new  ArrayList<>();
+        filledBlocks = new ArrayList<>();
         empty = true;
         this.setupBoard();
         count = 0;
@@ -28,12 +36,66 @@ public class Board {
                 count++;
             }
 
+        height = Dimension.DIMY.getDim();
+        width = Dimension.DIMX.getDim();
+
+        top = 0;
+        bottom = height - 1;
+        left = 0;
+        right = width - 1;
+
         this.empty = true;
+    }
+
+    public int getWidth() {
+        return width;
     }
 
     public void setBlock(Position pos, Tile tile) {
         board.put(pos, tile);
         filledBlocks.add(pos);
+
+//        if (pos.getX() == top) {
+//            top--;
+//
+//            for (int y = left; y <= right; y++) {
+//                board.put(new Position(top, y), null);
+//                count++;
+//            }
+//
+//            height ++;
+//        }
+//        else if (pos.getX() == bottom) {
+//            bottom++;
+//
+//            for (int y = left; y <= right; y++) {
+//                board.put(new Position(bottom, y), null);
+//                count++;
+//            }
+//
+//            height ++;
+//        }
+//        else if (pos.getY() == left) {
+//            left--;
+//
+//            for (int x = top; x <= bottom; x++) {
+//                board.put(new Position(x, left), null);
+//                count++;
+//            }
+//
+//            width++;
+//        }
+//        else if (pos.getY() == right) {
+//            right++;
+//
+//            for (int x = top; x <= bottom; x++) {
+//                board.put(new Position(x, right), null);
+//                count++;
+//            }
+//
+//            width++;
+//        }
+
         count++;
     }
 
@@ -41,7 +103,7 @@ public class Board {
         return board.get(pos);
     }
 
-    public Tile removeTile(Position pos){
+    public Tile removeTile(Position pos) {
         count--;
         filledBlocks.remove(pos);
         return board.put(pos, null);
@@ -51,7 +113,7 @@ public class Board {
         return count <= 0;
     }
 
-    public ArrayList<Tile> getBlocks(){
+    public ArrayList<Tile> getBlocks() {
         return new ArrayList<>(board.values());
     }
 
@@ -59,11 +121,11 @@ public class Board {
         return board;
     }
 
-    public ArrayList<Position> getBlocks(int i){
+    public ArrayList<Position> getBlocks(int i) {
         return new ArrayList<>(board.keySet());
     }
 
-    public List<Position> getFilledBlocks(){
+    public List<Position> getFilledBlocks() {
         return filledBlocks;
     }
 }

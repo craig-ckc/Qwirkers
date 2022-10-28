@@ -1,18 +1,14 @@
 package Server.messages.client;
 
+import Game.Models.Player;
 import Server.messages.Message;
-
+ 
 public class Join extends Message{
     private static final long serialVersionUID = 1L;
-    public String name;
-    public int avatar;
 
-    public Join(String name, int avatar) {
-        this.name = name;
-    }
+    public Player player;
 
-    @Override
-    public String toString() {
-        return String.format("%s joined", name);
+    public Join(Player player) {
+        this.player = player;
     }
 }

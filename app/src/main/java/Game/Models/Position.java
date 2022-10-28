@@ -42,8 +42,6 @@ public class Position implements Comparable<Position>{
 
 	@Override
 	public int compareTo(Position o) {
-		// TODO Auto-generated method stub
-
 		if (x == o.getX()) {
 			if (y == o.getY()) {
 				return 0;

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class OnlineGame implements Serializable {
+public class GameOffline implements Serializable {
     private Board board;
     private Rules rules;
     private Player currentPlayer;
@@ -14,7 +14,7 @@ public class OnlineGame implements Serializable {
     private List<Move> moves;
     private int playerCount; // helper number to change the players
 
-    public OnlineGame(List<Player> players) {
+    public GameOffline(List<Player> players) {
         this.players = players;
         this.moves = new ArrayList<>();
     }
@@ -35,8 +35,6 @@ public class OnlineGame implements Serializable {
         currentPlayer = players.get(0);
 
         playerCount = 0;
-
-        System.out.println("Working AOK");
     }
 
     // endregion
@@ -67,6 +65,10 @@ public class OnlineGame implements Serializable {
 
     public List<Position> validMoves(Tile tile) {
         return rules.validMoves(tile, board);
+    }
+
+    public int getBoardWidth() {
+        return board.getWidth();
     }
 
     public boolean placeTile(Tile tile, Position position) {
@@ -102,7 +104,12 @@ public class OnlineGame implements Serializable {
 
         // refill currentPlayers hand
         while (currentPlayer.getHand().size() < Player.MAXHANDSIZE) {
-            currentPlayer.receiveTile(bag.takeTile());
+            Tile tile = bag.takeTile();
+
+            if(tile == null)
+                break;
+
+            currentPlayer.receiveTile(tile);
         }
 
         // change player
@@ -150,15 +157,6 @@ public class OnlineGame implements Serializable {
         changePlayer();
     }
 
-    private void seePlayersHands() {
-        for (Player player : players) {
-            System.out.println(player.getName() + "'s hand:");
-            for (Tile tile : player.getHand()) {
-                System.out.println(tile);
-            }
-            System.out.println();
-        }
-    }
 
     public int getBagSize(){
         return bag.getSize();

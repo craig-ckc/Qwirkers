@@ -1,20 +1,16 @@
 package Server.messages.server;
 
+import java.util.List;
+
+import Game.Models.Player;
 import Server.messages.Message;
+ 
+public class Left extends Message{
+    private static final long serialVersionUID = 106L;
+    
+    public List<Player> players;
 
-public class Left extends Message {
-    private static final long serialVersionUID = 102L;
-
-    public String groupName;
-    public String handle;
-
-    public Left(String groupName, String handle) {
-        this.groupName = groupName;
-        this.handle = handle;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Left('%s', '%s')", groupName, handle);
+    public Left(List<Player> players) {
+        this.players = players;
     }
 }

@@ -25,9 +25,11 @@
 
         <activity android:name=".OfflineLobby" />
 
+        <activity android:name=".OfflineGame" />
+
         <activity android:name=".OnlineLobby" />
 
-        <activity android:name=".GamePlay" />
+        <activity android:name=".OnlineGame" />
 
         <activity android:name=".GameRanking" />
 

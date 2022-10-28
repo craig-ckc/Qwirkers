@@ -18,4 +18,10 @@
     <string name="offline_lobby_instructions">Enter name and select character </string>
     <string name="trade_dialog_text">Select all the tiles you want to swap from your hand</string>
     <string name="player_name_hint">Player name</string>
+
+    <string-array name="numbers">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
 </resources>
