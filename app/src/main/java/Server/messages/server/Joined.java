@@ -9,8 +9,10 @@ public class Joined extends Message {
     private static final long serialVersionUID = 101L;
 
     public List<Player> players;
+    public String player;
 
-    public Joined(List<Player> players) {
+    public Joined(List<Player> players, String player) {
         this.players = players;
+        this.player = player;
     }
 }
