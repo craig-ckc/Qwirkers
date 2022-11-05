@@ -1,5 +1,7 @@
 package Game.Models;
 
+import java.util.Objects;
+
 public class Position implements Comparable<Position>{
 	private final int x;
 	private final int y;
@@ -33,11 +35,12 @@ public class Position implements Comparable<Position>{
 			return false;
 			
 		Position position = (Position) obj;
-		return (this.getX() == position.getX() && this.getY() == position.getY());
+		return (x == position.x && y == position.y);
 	}
 
-	public boolean equals(String position){
-		return (x + "," + y).equals(position);
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y);
 	}
 
 	@Override

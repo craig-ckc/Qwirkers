@@ -1,7 +1,5 @@
 package Server;
 
-import android.util.Log;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -10,8 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import Server.messages.Message;
 import Server.messages.Receiver;
-import Server.messages.client.Quit;
-import Server.messages.client.SetHandle;
+import Server.messages.client.Leave;
 
 public class Client {
     private static Client instance;
@@ -22,6 +19,12 @@ public class Client {
     private Receiver receiver;
     private Thread readThread;
     private Thread writeThread;
+    private Socket connection;
+
+    public String session;
+    public String name;
+
+    public int turn;
 
     private Client() {
         super();
@@ -46,7 +49,7 @@ public class Client {
             return instance.connection.isConnected();
     }
 
-    private void send(Message message) {
+    public void send(Message message) {
         try {
             outgoingMessages.put(message);
         } catch (InterruptedException e) {
@@ -54,17 +57,16 @@ public class Client {
         }
     }
 
-    public void connect(String serverAddress, String handle) {
+    public void connect(String serverAddress) {
         this.serverAddress = serverAddress;
 
         readThread = new ReadThread();
         readThread.start();
 
-        send(new SetHandle(handle));
     }
 
     public void disconnect() {
-        send(new Quit());
+        send(new Leave(session, name));
     }
 
     private class ReadThread extends Thread {
@@ -74,7 +76,7 @@ public class Client {
             readThread = this;
 
             try {
-                Socket connection = new Socket(serverAddress, 5050);
+                connection = new Socket(serverAddress, 5050);
 
                 input = new ObjectInputStream(connection.getInputStream());
                 output = new ObjectOutputStream(connection.getOutputStream());
@@ -88,7 +90,7 @@ public class Client {
                     msg = (Message) input.readObject();
 
                     if (receiver != null) receiver.received(msg);
-                } while (msg.getClass() != Quit.class);
+                } while (msg.getClass() != Leave.class);
 
                 connection.close();
 

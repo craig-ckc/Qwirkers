@@ -3,11 +3,14 @@ package Game.Models;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Player implements Serializable {
-	private String name;
-	private List<Tile> hand;
-	private int profileImg;
+	private static final long serialVersionUID = 206L;
+
+	private final String name;
+	private final List<Tile> hand;
+	private int avatar;
 	private int points;
 	public static final int MAXHANDSIZE = 6;
 
@@ -17,9 +20,9 @@ public class Player implements Serializable {
 		points = 0;
 	}
 
-	public Player(String name, int profileImg) {
+	public Player(String name, int avatar) {
 		this.name = name;
-		this.profileImg = profileImg;
+		this.avatar = avatar;
 		hand = new ArrayList<Tile>();
 		points = 0;
 	}
@@ -40,6 +43,10 @@ public class Player implements Serializable {
 		return null;
 	}
 
+	public void emptyHand(){
+		hand.clear();
+	}
+
 	// add points to the players current points
 	public void addPoints(int points) {
 		this.points = this.points + points;
@@ -57,8 +64,52 @@ public class Player implements Serializable {
 		return this.name;
 	}
 
-	public int getProfileImg() {
-		return profileImg;
+	public int getAvatar() {
+		return avatar;
+	}
+
+	public int similarAttribute() {
+		List<Tile> tiles = this.getHand();
+		int colorCount = 0;
+		int shapeCount = 0;
+
+		int index = 0;
+
+		while (index < Player.MAXHANDSIZE) {
+			int temp = 0;
+			for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
+				temp += tiles.get(index).color() == tiles.get(i).color() ? 1 : 0;
+			}
+			colorCount = Math.max(colorCount, temp);
+			index++;
+		}
+
+		index = 0;
+
+		while (index < Player.MAXHANDSIZE) {
+			int temp = 0;
+			for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
+				temp += tiles.get(index).shape() == tiles.get(i).shape() ? 1 : 0;
+			}
+			shapeCount = Math.max(shapeCount, temp);
+			index++;
+		}
+
+		return Math.max(shapeCount, colorCount);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Player))
+			return false;
+
+		Player player = (Player) obj;
+		return avatar == player.avatar && player.name.equals(name);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, avatar);
 	}
 
 	@Override

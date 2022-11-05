@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -17,13 +18,15 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qwirkers.Utility.AvatarAdapter;
 import com.example.qwirkers.Utility.EqualSpaceItemDecoration;
+import com.example.qwirkers.Utility.Utilities;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class OnlineLobby extends AppCompatActivity {
@@ -33,6 +36,9 @@ public class OnlineLobby extends AppCompatActivity {
     private AvatarAdapter avatarAdapter;
     private RecyclerView avatarSelection;
     private int avatar;
+
+    private Dialog dialog;
+    private Utilities.LoadingAnimation loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,12 +77,23 @@ public class OnlineLobby extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (dialog != null)
+            dialog.dismiss();
+
+        if (loading != null)
+            loading.interrupt();
+    }
+
     public void cancel(View view) {
         finish();
     }
 
     public void confirm(View view) {
-        final Dialog dialog = createDialog(OnlineLobby.this, R.layout.ip_address_dialog, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialog = createDialog(OnlineLobby.this, R.layout.ip_address_dialog, Gravity.BOTTOM, WindowManager.LayoutParams.WRAP_CONTENT);
 
         EditText ipAddress = dialog.findViewById(R.id.ip_address);
         Button cancelButton = dialog.findViewById(R.id.cancel_button);
@@ -84,22 +101,42 @@ public class OnlineLobby extends AppCompatActivity {
 
         ipAddress.setText(sharedPref.getString(SERVER_ADDRESS, ""));
 
+        dialog.findViewById(R.id.loading).setVisibility(View.INVISIBLE);
+
+        List<View> circles = Arrays.asList(
+                dialog.findViewById(R.id.circle_01),
+                dialog.findViewById(R.id.circle_02),
+                dialog.findViewById(R.id.circle_03));
+
+        loading = new Utilities.LoadingAnimation(OnlineLobby.this, circles);
+        loading.start();
+
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.findViewById(R.id.loading).setVisibility(View.VISIBLE);
+
+//                if(loading.isInterrupted())
+//                    loading.start();
+
                 String serverAddress = ipAddress.getText().toString();
 
+                SharedPreferences.Editor editor = sharedPref.edit();
+
                 if (!sharedPref.contains(SERVER_ADDRESS) || !serverAddress.equals(sharedPref.getString(SERVER_ADDRESS, ""))) {
-                    SharedPreferences.Editor editor = sharedPref.edit();
                     editor.putString(USER_NAME, input.getText().toString());
-                    editor.putInt(USER_AVATAR, avatar);
-                    editor.apply();
+                    editor.putString(SERVER_ADDRESS, serverAddress);
                 }
+
+                if (!sharedPref.contains(USER_AVATAR) || avatar != sharedPref.getInt(USER_AVATAR, -1)) {
+                    editor.putInt(USER_AVATAR, avatar);
+                }
+
+                editor.apply();
 
                 Intent intent = new Intent(OnlineLobby.this, OnlineGame.class);
                 intent.putExtra(SERVER_ADDRESS, serverAddress);
                 startActivity(intent);
-
             }
         });
 
@@ -109,26 +146,6 @@ public class OnlineLobby extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
-
-        dialog.show();
-    }
-
-    /* Decrepit */
-    public void _confirm(View view) {
-        if (!sharedPref.contains(USER_NAME) || !input.getText().toString().equals(sharedPref.getString(USER_NAME, "")) || avatar != sharedPref.getInt(USER_AVATAR, -1)) {
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(USER_NAME, input.getText().toString());
-            editor.putInt(USER_AVATAR, avatar);
-            editor.apply();
-        }
-
-        Dialog dialog = createDialog(OnlineLobby.this, R.layout.online_lobby_modal, WindowManager.LayoutParams.WRAP_CONTENT);
-
-        RecyclerView waiting_players = dialog.findViewById(R.id.waiting_players);
-        waiting_players.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        // waiting_players.setAdapter(lobbyAvatarAdapter);
-        waiting_players.addItemDecoration(new EqualSpaceItemDecoration(5));
-
 
         dialog.show();
     }

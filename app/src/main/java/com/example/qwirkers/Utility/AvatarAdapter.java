@@ -1,5 +1,7 @@
 package com.example.qwirkers.Utility;
 
+import static com.example.qwirkers.Utility.Utilities.setAvatar;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +50,7 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarView
     @Override
     public void onBindViewHolder(@NonNull AvatarViewHolder holder, int position) {
         int avatar = avatars.get(position);
-        holder.setAvatar(avatar);
+        holder.setavatar(avatar);
         holder.itemView.setOnClickListener(onClickListener);
     }
 
@@ -84,10 +86,10 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarView
             avatar = view.findViewById(R.id.playerProfile);
         }
 
-        public void setAvatar(int avatarInt) {
+        public void setavatar(int avatarInt) {
             this.avatarInt = avatarInt;
 
-            avatar.setImageResource(setBlockImage(avatarInt));
+            avatar.setImageResource(setAvatar(avatarInt));
 
             highlight();
         }
@@ -97,38 +99,6 @@ public class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.AvatarView
                 itemView.setStrokeColor(ContextCompat.getColor(context, R.color.highlight));
             } else {
                 itemView.setStrokeColor(ContextCompat.getColor(context, R.color.transparent));
-            }
-        }
-
-        private int setBlockImage(int avatar) {
-            switch (avatar) {
-                case 1:
-                    return R.drawable.prof_01;
-                case 2:
-                    return R.drawable.prof_02;
-                case 3:
-                    return R.drawable.prof_03;
-                case 4:
-                    return R.drawable.prof_04;
-                case 5:
-                    return R.drawable.prof_05;
-                case 6:
-                    return R.drawable.prof_06;
-                case 7:
-                    return R.drawable.prof_07;
-                case 8:
-                    return R.drawable.prof_08;
-                case 9:
-                    return R.drawable.prof_09;
-                case 10:
-                    return R.drawable.prof_10;
-                case 11:
-                    return R.drawable.prof_11;
-                case 12:
-                    return R.drawable.prof_12;
-                default:
-                    return R.drawable.empty;
-
             }
         }
 

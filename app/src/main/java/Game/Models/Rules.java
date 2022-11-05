@@ -1,7 +1,13 @@
 package Game.Models;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import Game.Enums.Dimension;
 import Game.Enums.Direction;
@@ -9,30 +15,22 @@ import Game.Enums.Direction;
 public class Rules {
     private static final int MAXLINELENGHT = 6;
     private Board board;
+    private List<Move> moves;
 
     public Rules() {
     }
 
-    // region SETUP
-
     public List<Player> playerOrder(List<Player> players) {
-        int n = players.size();
-        for (int i = 0; i < n - 1; i++)
-            for (int j = 0; j < n - i - 1; j++)
-                if (similarAttriteCount(players.get(j)) < similarAttriteCount(players.get(j + 1))) {
-                    Player temp = players.get(j);
-                    players.set(j, players.get(j + 1));
-                    players.set(j + 1, temp);
-                }
-
-        return players;
+        return players.stream()
+                .sorted(Comparator.comparingInt(Player::similarAttribute).reversed())
+                .collect(Collectors.toList());
     }
 
     public void setBoard(Board board) {
         this.board = board;
     }
 
-    private int similarAttriteCount(Player player) {
+    private int similarAttributeCount(Player player) {
         List<Tile> tiles = player.getHand();
         int colorCount = 0;
         int shapeCount = 0;
@@ -42,7 +40,7 @@ public class Rules {
         while (index < Player.MAXHANDSIZE) {
             int temp = 0;
             for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
-                temp += tiles.get(index).getColor() == tiles.get(i).getColor() ? 1 : 0;
+                temp += tiles.get(index).color() == tiles.get(i).color() ? 1 : 0;
             }
             colorCount = Math.max(colorCount, temp);
             index++;
@@ -53,7 +51,7 @@ public class Rules {
         while (index < Player.MAXHANDSIZE) {
             int temp = 0;
             for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
-                temp += tiles.get(index).getShape() == tiles.get(i).getShape() ? 1 : 0;
+                temp += tiles.get(index).shape() == tiles.get(i).shape() ? 1 : 0;
             }
             shapeCount = Math.max(shapeCount, temp);
             index++;
@@ -62,17 +60,13 @@ public class Rules {
         return Math.max(shapeCount, colorCount);
     }
 
-    // endregion
-
-    // region GAMEPLAY
-
-    public boolean checkWinCondition(Player currentPlayer, Bag bag) {
-        return currentPlayer.getHand().size() == 0 && bag.getSize() == 0;
+    public boolean gameOver(Player player, Bag bag) {
+        return bag.getSize() < 1 && player.getHand().size() < 1;
     }
 
     public List<Position> validMoves(Tile tile, Board board) {
         List<Position> locations = new ArrayList<>();
-        Dimension[] dim = new Dimension[] { Dimension.DIMX, Dimension.DIMY };
+        Dimension[] dim = new Dimension[]{Dimension.DIMX, Dimension.DIMY};
 
         this.board = board;
 
@@ -80,13 +74,6 @@ public class Rules {
             locations.add(new Position((Dimension.DIMX.getDim() / 2), (Dimension.DIMY.getDim() / 2)));
             return locations;
         }
-
-        // NOTE: This iterates through every block which takes up too much time
-        // for (int x = 0; x < dim[0].getDim(); x++)
-        //     for (int y = 0; y < dim[1].getDim(); y++)
-        //         if (isValid(new Position(x, y), tile)) {
-        //             locations.add(new Position(x, y));
-        //         }
 
         List<Position> potential = getPotentialBlocks();
 
@@ -128,8 +115,7 @@ public class Rules {
         return isNeighbourhoodValid(top, right, down, left, tile);
     }
 
-    private boolean isNeighbourhoodValid(List<Tile> top, List<Tile> right, List<Tile> down, List<Tile> left,
-            Tile tile) {
+    private boolean isNeighbourhoodValid(List<Tile> top, List<Tile> right, List<Tile> down, List<Tile> left, Tile tile) {
 
         if (top.size() + down.size() - 1 > MAXLINELENGHT)
             return false;
@@ -172,7 +158,7 @@ public class Rules {
         // CASE 02: Check if the line has a duplicate of the tile
         Tile prev = line.get(0);
         for (int i = 1; i < line.size(); i++)
-            if (prev.equal(line.get(i)))
+            if (prev.equals(line.get(i)))
                 return false;
 
         // CASE 04: Check if all the Tiles in the line have a similar attribute
@@ -194,7 +180,7 @@ public class Rules {
     private List<Tile> getNeighbours(int x, int y) {
         List<Tile> tiles = new ArrayList<Tile>();
 
-        Direction[] dirs = new Direction[] { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT };
+        Direction[] dirs = new Direction[]{Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
 
         for (Direction dir : dirs) {
             if ((board.getBlock(new Position(x + dir.getX(), y + dir.getY())) != null))
@@ -222,52 +208,73 @@ public class Rules {
         return tiles;
     }
 
-    // endregion
-
-    // region SCORING
-
-    public int scorePlayer(int x, int y) {
-        int points = 0;
-
-        Direction[] dirs = new Direction[] { Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT };
-
-        for (Direction dir : dirs) {
-            List<Tile> line = getLine(x, y, dir, board.getBlock(new Position(x, y)));
-            points += (line.size() > 1) ? line.size() : 0;
-        }
-
-        return points;
-    }
-
     public List<Player> playerRanking(List<Player> players) {
-        // Bubble Sort Algorithm
-        int n = players.size();
-        for (int i = 0; i < n - 1; i++)
-            for (int j = 0; j < n - i - 1; j++)
-                if (players.get(j).getPoints() < players.get(j + 1).getPoints()) {
-                    Player temp = players.get(j);
-                    players.set(j, players.get(j + 1));
-                    players.set(j + 1, temp);
-                }
-
-        return players;
+        return players.stream()
+                .sorted(Comparator.comparingInt(Player::getPoints).reversed())
+                .collect(Collectors.toList());
     }
 
-    // endregion
-
-    private List<Position> getPotentialBlocks(){
+    private List<Position> getPotentialBlocks() {
         List<Position> potential = new ArrayList<>();
-        List<Position> filledBlocks = board.getFilledBlocks();
+        List<Position> filledBlocks = board.filledBlocks();
 
-        for (Position position: filledBlocks) {
-            for (Direction dir : Direction.values()) { 
+        for (Position position : filledBlocks) {
+            for (Direction dir : Direction.values()) {
                 Position pos = new Position(position.getX() + dir.getX(), position.getY() + dir.getY());
-                if(board.getBlock(pos) == null){
+                if (board.getBlock(pos) == null) {
                     potential.add(pos);
                 }
             }
         }
 
         return potential;
+    }
+
+    private List<Move> getLineMove(int x, int y, Direction dir, Move move) {
+        List<Move> moves = new ArrayList<>();
+
+        x += dir.getX();
+        y += dir.getY();
+
+        while (board.getBlock(new Position(x, y)) != null) {
+            Tile tile = board.getBlock(new Position(x, y));
+            Position pos = new Position(x, y);
+
+            moves.add(new Move(tile, pos));
+
+            x += dir.getX();
+            y += dir.getY();
+        }
+
+        return moves;
+    }
+
+    public Map<Position, Integer> scores(Move move, List<Move> moves) {
+        Map<Position, Integer> entries = new HashMap<>();
+        Position pos = move.getPosition();
+
+        // point on the vertical line
+        int points = 0;
+        List<Move> vertical = Stream
+                .concat(
+                        getLineMove(pos.getX(), pos.getY(), Direction.UP, move).stream(),
+                        getLineMove(pos.getX(), pos.getY(), Direction.DOWN, move).stream()
+                ).collect(Collectors.toList());
+
+        points += (vertical.size() < 1) ? vertical.size() : vertical.size() + 1;
+        entries.put(new Position(0, pos.getY()), points);
+
+        // point on the horizontal line
+        points = 0;
+        List<Move> horizontal = Stream
+                .concat(
+                        getLineMove(pos.getX(), pos.getY(), Direction.RIGHT, move).stream(),
+                        getLineMove(pos.getX(), pos.getY(), Direction.LEFT, move).stream()
+                ).collect(Collectors.toList());
+
+        points += (horizontal.size() < 1) ? horizontal.size() : horizontal.size() + 1;
+        entries.put(new Position(pos.getX(), 0), points);
+
+        return entries;
     }
 }

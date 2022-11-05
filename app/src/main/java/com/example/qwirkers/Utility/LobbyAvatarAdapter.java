@@ -1,5 +1,7 @@
 package com.example.qwirkers.Utility;
 
+import static com.example.qwirkers.Utility.Utilities.setAvatar;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +19,7 @@ import java.util.List;
 import Game.Models.Player;
 
 public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.LobbyAvatarViewHolder> {
-    private final List<Player> players;
+    private List<Player> players;
     private final Context context;
 
     public LobbyAvatarAdapter(Context context, List<Player> players) {
@@ -49,60 +51,28 @@ public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.
         notifyItemChanged(players.size() - 1);
     }
 
-    public void remove(int position) {
-        players.remove(position);
-        notifyItemRemoved(position);
+    public void setPlayers(List<Player> players){
+        this.players = players;
+        notifyDataSetChanged();
     }
 
     public class LobbyAvatarViewHolder extends RecyclerView.ViewHolder {
         public TextView playerName;
-        public ImageView playerProfile;
+        public ImageView avatar;
         private Player player;
 
         public LobbyAvatarViewHolder(@NonNull View view) {
             super(view);
 
             playerName = view.findViewById(R.id.player_hand);
-            playerProfile = view.findViewById(R.id.playerProfile);
+            avatar = view.findViewById(R.id.playerProfile);
         }
 
         public void setPlayer(Player player) {
             this.player = player;
 
             playerName.setText(player.getName());
-            playerProfile.setImageResource(setBlockImage(player.getProfileImg()));
-        }
-
-        private int setBlockImage(int profileImg) {
-            switch (profileImg) {
-                case 1:
-                    return R.drawable.prof_01;
-                case 2:
-                    return R.drawable.prof_02;
-                case 3:
-                    return R.drawable.prof_03;
-                case 4:
-                    return R.drawable.prof_04;
-                case 5:
-                    return R.drawable.prof_05;
-                case 6:
-                    return R.drawable.prof_06;
-                case 7:
-                    return R.drawable.prof_07;
-                case 8:
-                    return R.drawable.prof_08;
-                case 9:
-                    return R.drawable.prof_09;
-                case 10:
-                    return R.drawable.prof_10;
-                case 11:
-                    return R.drawable.prof_11;
-                case 12:
-                    return R.drawable.prof_12;
-                default:
-                    return R.drawable.empty;
-
-            }
+            avatar.setImageResource(setAvatar(player.getAvatar()));
         }
 
     }

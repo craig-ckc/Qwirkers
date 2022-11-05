@@ -1,5 +1,7 @@
 package com.example.qwirkers.Utility;
 
+import static com.example.qwirkers.Utility.Utilities.setAvatar;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +22,7 @@ import java.util.List;
 import Game.Models.Player;
 
 public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerViewHolder> {
-    private final List<Player> players;
+    private List<Player> players;
     private final Context context;
     private final List<PlayerViewHolder> viewHolderList;
     private Player currentPlayer;
@@ -34,9 +36,9 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
     public PlayerAdapter(Context context, List<Player> players, Player currentPlayer) {
         this.context = context;
         this.players = players;
-        setCurrentPlayer(currentPlayer);
-
         this.viewHolderList = new ArrayList<>();
+
+        setCurrentPlayer(currentPlayer);
     }
 
     @NonNull
@@ -53,7 +55,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         Player player = players.get(position);
         holder.setPlayer(player);
 
-        if(currentPlayer == player)
+        if (currentPlayer == player)
             holder.highlight();
     }
 
@@ -72,13 +74,23 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         notifyItemRemoved(position);
     }
 
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+        notifyDataSetChanged();
+    }
+
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
         highlightPlayer();
+        notifyItemChanged(players.indexOf(currentPlayer));
+    }
+
+    public Player currentPlayer() {
+        return currentPlayer;
     }
 
     public void highlightPlayer() {
-        for(PlayerViewHolder vh : viewHolderList)
+        for (PlayerViewHolder vh : viewHolderList)
             vh.highlight();
     }
 
@@ -106,7 +118,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
             playerName.setText(player.getName());
             playerPoints.setText(String.valueOf(player.getPoints()));
             playerHand.setText(String.valueOf(player.getHand().size()));
-            playerProfile.setImageResource(setBlockImage(player.getProfileImg()));
+            playerProfile.setImageResource(setAvatar(player.getAvatar()));
         }
 
         public void highlight() {
@@ -114,38 +126,6 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
                 playerCard.setStrokeColor(ContextCompat.getColor(context, R.color.highlight));
             } else {
                 playerCard.setStrokeColor(ContextCompat.getColor(context, R.color.transparent));
-            }
-        }
-
-        private int setBlockImage(int profileImg) {
-            switch (profileImg) {
-                case 1:
-                    return R.drawable.prof_01;
-                case 2:
-                    return R.drawable.prof_02;
-                case 3:
-                    return R.drawable.prof_03;
-                case 4:
-                    return R.drawable.prof_04;
-                case 5:
-                    return R.drawable.prof_05;
-                case 6:
-                    return R.drawable.prof_06;
-                case 7:
-                    return R.drawable.prof_07;
-                case 8:
-                    return R.drawable.prof_08;
-                case 9:
-                    return R.drawable.prof_09;
-                case 10:
-                    return R.drawable.prof_10;
-                case 11:
-                    return R.drawable.prof_11;
-                case 12:
-                    return R.drawable.prof_12;
-                default:
-                    return R.drawable.empty;
-
             }
         }
 

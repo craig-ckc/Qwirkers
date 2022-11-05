@@ -2,24 +2,26 @@ package Game.Models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GameOffline implements Serializable {
+public class LocalGame implements Serializable {
+    private final List<Move> moves;
+    private final Map<Position, Integer> points;
     private Board board;
     private Rules rules;
     private Player currentPlayer;
     private List<Player> players;
     private Bag bag;
-    private List<Move> moves;
     private int playerCount; // helper number to change the players
 
-    public GameOffline(List<Player> players) {
+
+    public LocalGame(List<Player> players) {
         this.players = players;
         this.moves = new ArrayList<>();
+        this.points = new HashMap<>();
     }
-
-    // region SETUP
 
     public void start() {
         board = new Board();
@@ -37,8 +39,6 @@ public class GameOffline implements Serializable {
         playerCount = 0;
     }
 
-    // endregion
-
     private void dealHands() {
         for (Player player : players) {
             for (int i = 0; i < Player.MAXHANDSIZE; i++) {
@@ -47,15 +47,12 @@ public class GameOffline implements Serializable {
         }
     }
 
-
-    // #region GAME PLAY
-
     public ArrayList<Tile> getBoard() {
-        return board.getBlocks();
+        return board.blocks();
     }
 
     public Map<Position, Tile> getBoard(int i) {
-        return board.getBoard();
+        return board.board();
     }
 
     public void changePlayer() {
@@ -72,13 +69,21 @@ public class GameOffline implements Serializable {
     }
 
     public boolean placeTile(Tile tile, Position position) {
-        if(!rules.isValid(position, tile)) return false;
+        if (!rules.isValid(position, tile)) return false;
 
         Move move = new Move(currentPlayer.removeTile(tile), position);
         board.setBlock(position, tile);
         moves.add(move);
 
-        // TODO: check if the players hand is empty and the bag is empty as well (Win condition)
+        Map<Position, Integer> entries = rules.scores(move, moves);
+        for (Position pos : entries.keySet()){
+            if (points.containsKey(pos)){
+                if(entries.get(pos) > points.get(pos))
+                    points.replace(pos, entries.get(pos));
+            }
+            else
+                points.put(pos, entries.get(pos));
+        }
 
         return true;
     }
@@ -87,26 +92,38 @@ public class GameOffline implements Serializable {
         board.setBlock(position, tile);
     }
 
-
     public void scorePlay() {
-        for (Move move : moves) {
-            Position position = move.getPosition();
-            currentPlayer.addPoints(rules.scorePlayer(position.getX(), position.getY()));
-        }
+        int score = 0;
+
+        for (Integer point : points.values())
+            score += point;
+
+        currentPlayer.addPoints((score > 0) ? score : 1);
     }
 
-    public void donePlay() {
+    public void scorePlay(int score) {
+        currentPlayer.addPoints(score);
+    }
+
+    public boolean done() {
         // score the moves made by the current player
         scorePlay();
 
         // clear the move list for the next player
         moves.clear();
+        points.clear();
+
+        // check win condition
+        if (bag.getSize() < 1 && currentPlayer.getHand().size() < 1) {
+            scorePlay(6);
+            return true;
+        }
 
         // refill currentPlayers hand
-        while (currentPlayer.getHand().size() < Player.MAXHANDSIZE) {
+        while (currentPlayer.getHand().size() < Player.MAXHANDSIZE && bag.getSize() > 0) {
             Tile tile = bag.takeTile();
 
-            if(tile == null)
+            if (tile == null)
                 break;
 
             currentPlayer.receiveTile(tile);
@@ -114,11 +131,13 @@ public class GameOffline implements Serializable {
 
         // change player
         changePlayer();
+
+        return false;
     }
 
     public void undoLastMove() {
         // return if there is no moves to undo
-        if(moves.size() < 1) return;
+        if (moves.size() < 1) return;
 
         Move move = moves.remove(moves.size() - 1);
 
@@ -138,7 +157,7 @@ public class GameOffline implements Serializable {
 
     public void trade(List<Tile> tiles) {
         if (tiles.size() < bag.getSize()) {
-            for(Tile tile : tiles){
+            for (Tile tile : tiles) {
                 currentPlayer.removeTile(tile);
             }
 
@@ -150,15 +169,12 @@ public class GameOffline implements Serializable {
         }
     }
 
-    // #endregion
-
     public void passPlay() {
         clearMoves();
         changePlayer();
     }
 
-
-    public int getBagSize(){
+    public int getBagSize() {
         return bag.getSize();
     }
 

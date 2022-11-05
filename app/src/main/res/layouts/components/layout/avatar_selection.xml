@@ -14,5 +14,5 @@
         android:id="@+id/playerProfile"
         android:layout_width="62dp"
         android:layout_height="62dp"
-        app:srcCompat="@drawable/prof_01" />
+        app:srcCompat="@drawable/avatar_01" />
 </com.google.android.material.card.MaterialCardView>

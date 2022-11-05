@@ -4,7 +4,9 @@ import static com.example.qwirkers.Utility.Utilities.PLAYER_LIST;
 import static com.example.qwirkers.Utility.Utilities.createDialog;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Game.Enums.Dimension;
-import Game.Models.GameOffline;
+import Game.Models.LocalGame;
 import Game.Models.Player;
 import Game.Models.Position;
 import Game.Models.Tile;
@@ -41,7 +43,7 @@ public class OfflineGame extends AppCompatActivity {
     private BoardAdapter boardAdapter;
     private HandAdapter handAdapter;
 
-    private GameOffline game;
+    private LocalGame game;
     private Player currentPlayer;
     private Tile selectedTile;
     private List<Position> validMoves;
@@ -56,7 +58,7 @@ public class OfflineGame extends AppCompatActivity {
         ArrayList<Player> playerList = (ArrayList<Player>) getIntent().getSerializableExtra(PLAYER_LIST);
 
         // Game instance
-        game = new GameOffline(playerList);
+        game = new LocalGame(playerList);
         game.start();
         currentPlayer = game.getCurrentPlayer();
 
@@ -110,33 +112,6 @@ public class OfflineGame extends AppCompatActivity {
 
         // endregion
 
-        board.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (selectedTile == null) return;
-
-                if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
-                    boardAdapter.notifyDataSetChanged();
-
-                    // deselect all blocks on the board
-                    validMoves.clear();
-                    boardAdapter.highlightValidMoves(validMoves);
-
-                    // deselect all tiles in hand
-                    selectedTile = null;
-                    handAdapter.highlight(selectedTile);
-
-//                    board.getLayoutParams().width = (Dimension.TILESIZE.getDim() * (offlineGame.getBoardWidth() + 1));
-
-                    handAdapter.notifyDataSetChanged();
-
-                    // update player card
-                    playerAdapter.notifyDataSetChanged();
-
-                }
-            }
-        });
-
         handAdapter.setOnClickListener(view -> {
             // Get view holder of the view.
             HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) hand.findContainingViewHolder(view);
@@ -158,10 +133,44 @@ public class OfflineGame extends AppCompatActivity {
             // TODO: Following code is slowing down app
             boardAdapter.highlightValidMoves(validMoves);
         });
+
+        board.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (selectedTile == null) return;
+
+                if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
+                    boardAdapter.notifyDataSetChanged();
+
+                    // deselect all blocks on the board
+                    validMoves.clear();
+                    boardAdapter.highlightValidMoves(validMoves);
+
+                    // deselect all tiles in hand
+                    selectedTile = null;
+                    handAdapter.highlight(selectedTile);
+
+                    // Dynamic board code
+                    // board.getLayoutParams().width = (Dimension.TILESIZE.getDim() * (offlineGame.getBoardWidth() + 1));
+
+                    handAdapter.notifyDataSetChanged();
+
+                    // update player card
+                    playerAdapter.notifyDataSetChanged();
+
+                }
+            }
+        });
+
     }
 
     public void done(View view) {
-        game.donePlay();
+        if(game.done()){
+            Intent intent = new Intent(this, GameRanking.class);
+            intent.putExtra(PLAYER_LIST, new ArrayList<>(game.getPlayers()));
+            finish();
+            startActivity(intent);
+        }
 
         currentPlayer = game.getCurrentPlayer();
         playerAdapter.setCurrentPlayer(currentPlayer);
@@ -183,7 +192,7 @@ public class OfflineGame extends AppCompatActivity {
     }
 
     public void trade(View view) {
-        final Dialog dialog = createDialog(OfflineGame.this, R.layout.trade_dialog, WindowManager.LayoutParams.MATCH_PARENT);
+        final Dialog dialog = createDialog(OfflineGame.this, R.layout.trade_dialog, Gravity.BOTTOM, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // region Trade Button
 
@@ -292,6 +301,10 @@ public class OfflineGame extends AppCompatActivity {
         cleanup();
     }
 
+    public void quit(View view) {
+        finish();
+    }
+
     private void cleanup() {
         // deselect all blocks on the board
         validMoves.clear();
@@ -309,7 +322,4 @@ public class OfflineGame extends AppCompatActivity {
         playerAdapter.notifyDataSetChanged();
     }
 
-    public void finish(View view) {
-        finish();
-    }
 }

@@ -1,9 +1,13 @@
 package Game.Models;
 
+import java.io.Serializable;
+
 import Game.Enums.Color;
 import Game.Enums.Shape;
 
-public class Tile {
+public class Tile implements Serializable {
+    private static final long serialVersionUID = 210L;
+
     private final Shape shape;
     private final Color color;
 
@@ -12,18 +16,18 @@ public class Tile {
         this.color = color;
     }
 
-    public Shape getShape() {
+    public Shape shape() {
         return this.shape;
     }
 
-    public Color getColor() {
+    public Color color() {
         return this.color;
     }
 
     public Object getSimilar(Tile tile) {
-        if (this.shape == tile.getShape()) {
+        if (this.shape == tile.shape()) {
             return this.shape;
-        } else if (this.color == tile.getColor()) {
+        } else if (this.color == tile.color()) {
             return this.color;
         } else {
             return null;
@@ -31,8 +35,13 @@ public class Tile {
     }
 
 
-    public boolean equal(Tile tile) {
-        return this.shape == tile.getShape() && this.color == tile.getColor();
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Tile))
+            return false;
+
+        Tile tile = (Tile) obj;
+        return shape == tile.shape && color == tile.color;
     }
 
     @Override

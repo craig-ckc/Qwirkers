@@ -1,5 +1,8 @@
 package com.example.qwirkers.Utility;
 
+import static com.example.qwirkers.Utility.Utilities.setColor;
+import static com.example.qwirkers.Utility.Utilities.setShape;
+
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
@@ -20,9 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import Game.Enums.Color;
 import Game.Enums.Dimension;
-import Game.Enums.Shape;
 import Game.Models.Position;
 import Game.Models.Tile;
 
@@ -67,8 +68,8 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
         if (tile == null) {
             imageView.setImageResource(R.drawable.empty);
         } else {
-            imageView.setImageResource(getTile(tile.getShape()));
-            imageView.setColorFilter(getColor(tile.getColor()), PorterDuff.Mode.SRC_IN);
+            imageView.setImageResource(setShape(tile.shape()));
+            imageView.setColorFilter(setColor(context, tile.color()), PorterDuff.Mode.SRC_IN);
         }
 
         MaterialCardView card = (MaterialCardView) block;
@@ -95,64 +96,15 @@ public class BoardAdapter extends ArrayAdapter<Tile> {
         return card;
     }
 
-
     public void highlightValidMoves(List<Position> validMoves) {
         this.validMoves = validMoves;
 
-//        for (Position pos : validMoves) {
-//            int position = getPos(pos);
-//            notifyDataSetChanged();
-//        }
-
         notifyDataSetChanged();
     }
-
-    private int getPos(Position pos) {
-        return (Dimension.DIMX.getDim() * (pos.getX() % Dimension.DIMX.getDim())) + (Dimension.DIMY.getDim() * (pos.getY() % Dimension.DIMY.getDim()));
-    }
-
 
     public Position selectedPosition(int position) {
         List<Map.Entry<Position, Tile>> positionList = new ArrayList<>(board.entrySet());
 
         return positionList.get(position).getKey();
-    }
-
-    private int getTile(Shape shape) {
-        switch (shape) {
-            case STAR:
-                return R.drawable.ic_star;
-            case CROSS:
-                return R.drawable.ic_cross;
-            case CIRCLE:
-                return R.drawable.ic_circle;
-            case CLOVER:
-                return R.drawable.ic_clover;
-            case SQUARE:
-                return R.drawable.ic_square;
-            case DIAMOND:
-                return R.drawable.ic_diamond;
-            default:
-                return R.drawable.ic_empty;
-        }
-    }
-
-    private int getColor(Color color) {
-        switch (color) {
-            case RED:
-                return ContextCompat.getColor(context, R.color.red);
-            case BLUE:
-                return ContextCompat.getColor(context, R.color.blue);
-            case GREEN:
-                return ContextCompat.getColor(context, R.color.green);
-            case ORANGE:
-                return ContextCompat.getColor(context, R.color.orange);
-            case PURPLE:
-                return ContextCompat.getColor(context, R.color.purple);
-            case YELLOW:
-                return ContextCompat.getColor(context, R.color.yellow);
-            default:
-                return ContextCompat.getColor(context, R.color.transparent);
-        }
     }
 }

@@ -22,17 +22,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import Server.ClientHandler;
-import Server.GameClient;
-import Server.messages.Message;
-import Server.messages.server.MoveReceived;
-
 public class GameMode extends AppCompatActivity {
-    private GameClient client;
 
     private SharedPreferences sharedPref;
 
@@ -44,7 +37,7 @@ public class GameMode extends AppCompatActivity {
     }
 
     public void offlineLobby(View view) {
-        final Dialog dialog = createDialog(GameMode.this, R.layout.player_count_dialog, WindowManager.LayoutParams.WRAP_CONTENT);
+        final Dialog dialog = createDialog(GameMode.this, R.layout.player_count_dialog, Gravity.BOTTOM, WindowManager.LayoutParams.WRAP_CONTENT);
 
         List<String> numbers = Arrays.asList("2", "3", "4");
 

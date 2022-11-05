@@ -110,22 +110,18 @@ public class Board {
     }
 
     public boolean isEmpty() {
-        return count <= 0;
+        return count < 1;
     }
 
-    public ArrayList<Tile> getBlocks() {
+    public ArrayList<Tile> blocks() {
         return new ArrayList<>(board.values());
     }
 
-    public Map<Position, Tile> getBoard() {
+    public Map<Position, Tile> board() {
         return board;
     }
 
-    public ArrayList<Position> getBlocks(int i) {
-        return new ArrayList<>(board.keySet());
-    }
-
-    public List<Position> getFilledBlocks() {
+    public List<Position> filledBlocks() {
         return filledBlocks;
     }
 }

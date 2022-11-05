@@ -2,12 +2,12 @@ package Server.messages.server;
 
 import Server.messages.Message;
 
-public class Confirmation extends Message {
+public class Confirmation extends Message{
     private static final long serialVersionUID = 100L;
+    
+    public String session;
 
-    public String game;
-
-    public Confirmation(String game){
-        this.game = game;
+    public Confirmation(String session){
+        this.session = session;
     }
 }

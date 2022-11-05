@@ -24,6 +24,9 @@ public class Bag {
     }
 
     public Tile takeTile() {
+        if(bag.size() == 1)
+            return bag.remove(0);
+
         Random rand = new Random();
         int value = rand.nextInt(bag.size() - 1);
 

@@ -156,7 +156,7 @@
         android:background="@drawable/button_background_game"
         android:drawableBottom="@drawable/ic_chevron_left"
         android:drawableTint="@color/highlight"
-        android:onClick="finish"
+        android:onClick="quit"
         app:iconPadding="0dp"
         android:padding="5dp"
         app:backgroundTint="@color/neutral_100"

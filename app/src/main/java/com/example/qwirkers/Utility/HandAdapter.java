@@ -1,5 +1,8 @@
 package com.example.qwirkers.Utility;
 
+import static com.example.qwirkers.Utility.Utilities.setColor;
+import static com.example.qwirkers.Utility.Utilities.setShape;
+
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
@@ -18,9 +21,7 @@ import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.List;
 
-import Game.Enums.Color;
 import Game.Enums.Dimension;
-import Game.Enums.Shape;
 import Game.Models.Tile;
 
 public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder> {
@@ -114,48 +115,10 @@ public class HandAdapter extends RecyclerView.Adapter<HandAdapter.TileViewHolder
             tileImage.setLayoutParams(new LinearLayout.LayoutParams(Dimension.TILESIZE.getDim(), Dimension.TILESIZE.getDim()));
 
             // setting the shape of the tile
-            tileImage.setImageResource(getTile(tile.getShape()));
+            tileImage.setImageResource(setShape(tile.shape()));
 
             // setting the color of the shape
-            tileImage.setColorFilter(getColor(tile.getColor()), PorterDuff.Mode.SRC_IN);
-        }
-
-        private int getTile(Shape shape){
-            switch (shape){
-                case STAR:
-                    return R.drawable.ic_star;
-                case CROSS:
-                    return R.drawable.ic_cross;
-                case CIRCLE:
-                    return R.drawable.ic_circle;
-                case CLOVER:
-                    return R.drawable.ic_clover;
-                case SQUARE:
-                    return R.drawable.ic_square;
-                case DIAMOND:
-                    return R.drawable.ic_diamond;
-                default:
-                    return R.drawable.ic_empty;
-            }
-        }
-
-        private int getColor(Color color){
-            switch (color){
-                case RED:
-                    return ContextCompat.getColor(context, R.color.red);
-                case BLUE:
-                    return ContextCompat.getColor(context, R.color.blue);
-                case GREEN:
-                    return ContextCompat.getColor(context, R.color.green);
-                case ORANGE:
-                    return ContextCompat.getColor(context, R.color.orange);
-                case PURPLE:
-                    return ContextCompat.getColor(context, R.color.purple);
-                case YELLOW:
-                    return ContextCompat.getColor(context, R.color.yellow);
-                default:
-                    return ContextCompat.getColor(context, R.color.transparent);
-            }
+            tileImage.setColorFilter(setColor(context, tile.color()), PorterDuff.Mode.SRC_IN);
         }
 
         public void highlight(Tile selectedTile) {
