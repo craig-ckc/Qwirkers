@@ -1,7 +1,5 @@
 package Game.Models;
 
-import java.util.Objects;
-
 public class Move {
     private final Tile tile;
     private final Position position;

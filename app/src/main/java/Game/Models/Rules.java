@@ -1,6 +1,5 @@
 package Game.Models;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,58 +14,32 @@ import Game.Enums.Direction;
 public class Rules {
     private static final int MAXLINELENGHT = 6;
     private Board board;
-    private List<Move> moves;
 
-    public Rules() {
-    }
+    public Rules() { }
 
     public List<Player> playerOrder(List<Player> players) {
-        return players.stream()
-                .sorted(Comparator.comparingInt(Player::similarAttribute).reversed())
+
+        List<Player> temp = players.stream()
+                .sorted(Comparator.comparingInt(Player::cluster).reversed())
                 .collect(Collectors.toList());
+
+        for (int i = 0; i < temp.size(); i++) {
+            temp.get(i).setTurn(i);
+        }
+
+        return temp;
     }
 
     public void setBoard(Board board) {
         this.board = board;
     }
 
-    private int similarAttributeCount(Player player) {
-        List<Tile> tiles = player.getHand();
-        int colorCount = 0;
-        int shapeCount = 0;
-
-        int index = 0;
-
-        while (index < Player.MAXHANDSIZE) {
-            int temp = 0;
-            for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
-                temp += tiles.get(index).color() == tiles.get(i).color() ? 1 : 0;
-            }
-            colorCount = Math.max(colorCount, temp);
-            index++;
-        }
-
-        index = 0;
-
-        while (index < Player.MAXHANDSIZE) {
-            int temp = 0;
-            for (int i = index + 1; i < Player.MAXHANDSIZE; i++) {
-                temp += tiles.get(index).shape() == tiles.get(i).shape() ? 1 : 0;
-            }
-            shapeCount = Math.max(shapeCount, temp);
-            index++;
-        }
-
-        return Math.max(shapeCount, colorCount);
-    }
-
     public boolean gameOver(Player player, Bag bag) {
-        return bag.getSize() < 1 && player.getHand().size() < 1;
+        return bag.getSize() < 1 && player.hand().size() < 1;
     }
 
     public List<Position> validMoves(Tile tile, Board board) {
         List<Position> locations = new ArrayList<>();
-        Dimension[] dim = new Dimension[]{Dimension.DIMX, Dimension.DIMY};
 
         this.board = board;
 
@@ -95,7 +68,7 @@ public class Rules {
             return true;
 
         // CASE 01: Check if the block is empty
-        if (board.getBlock(new Position(x, y)) != null)
+        if (board.block(new Position(x, y)) != null)
             return false;
 
         // CASE 02: Check if the block is connected to a tile
@@ -183,8 +156,8 @@ public class Rules {
         Direction[] dirs = new Direction[]{Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT};
 
         for (Direction dir : dirs) {
-            if ((board.getBlock(new Position(x + dir.getX(), y + dir.getY())) != null))
-                tiles.add(board.getBlock(new Position(x + dir.getX(), y + dir.getY())));
+            if ((board.block(new Position(x + dir.getX(), y + dir.getY())) != null))
+                tiles.add(board.block(new Position(x + dir.getX(), y + dir.getY())));
         }
 
         return tiles;
@@ -198,20 +171,14 @@ public class Rules {
         x += dir.getX();
         y += dir.getY();
 
-        while (board.getBlock(new Position(x, y)) != null) {
-            tiles.add(board.getBlock(new Position(x, y)));
+        while (board.block(new Position(x, y)) != null) {
+            tiles.add(board.block(new Position(x, y)));
 
             x += dir.getX();
             y += dir.getY();
         }
 
         return tiles;
-    }
-
-    public List<Player> playerRanking(List<Player> players) {
-        return players.stream()
-                .sorted(Comparator.comparingInt(Player::getPoints).reversed())
-                .collect(Collectors.toList());
     }
 
     private List<Position> getPotentialBlocks() {
@@ -221,7 +188,7 @@ public class Rules {
         for (Position position : filledBlocks) {
             for (Direction dir : Direction.values()) {
                 Position pos = new Position(position.getX() + dir.getX(), position.getY() + dir.getY());
-                if (board.getBlock(pos) == null) {
+                if (board.block(pos) == null) {
                     potential.add(pos);
                 }
             }
@@ -236,8 +203,8 @@ public class Rules {
         x += dir.getX();
         y += dir.getY();
 
-        while (board.getBlock(new Position(x, y)) != null) {
-            Tile tile = board.getBlock(new Position(x, y));
+        while (board.block(new Position(x, y)) != null) {
+            Tile tile = board.block(new Position(x, y));
             Position pos = new Position(x, y);
 
             moves.add(new Move(tile, pos));

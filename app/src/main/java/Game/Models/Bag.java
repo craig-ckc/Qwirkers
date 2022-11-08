@@ -12,18 +12,18 @@ public class Bag {
     protected List<Tile> bag = new ArrayList<Tile>();
 
     public Bag() {
-        createBag();
+        initi();
     }
 
-    private void createBag() {
+    private void initi() {
         for (int i = 0; i < SETS; i++)
             for (Shape shape : Shape.values())
                 for (Color color : Color.values())
                     if (!shape.equals(Shape.EMPTY) && !color.equals(Color.EMPTY))
-                        bag.add(new Tile(shape, color));
+                        bag.add(new Tile(i ,shape, color));
     }
 
-    public Tile takeTile() {
+    public Tile drawTile() {
         if(bag.size() == 1)
             return bag.remove(0);
 
@@ -33,15 +33,15 @@ public class Bag {
         return bag.remove(value);
     }
 
-    public void addTile(Tile tile) {
+    public void returnTile(Tile tile) {
         bag.add(tile);
     }
 
-    public List<Tile> tradeTile(List<Tile> tiles) {
+    public List<Tile> tradeTiles(List<Tile> tiles) {
         List<Tile> temp = new ArrayList<>();
 
         for (int i = 0; i < tiles.size(); i++) {
-            temp.add(takeTile());
+            temp.add(drawTile());
         }
 
         bag.addAll(tiles);

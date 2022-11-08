@@ -10,8 +10,10 @@ public class Tile implements Serializable {
 
     private final Shape shape;
     private final Color color;
+    private final int UID;
 
-    public Tile(Shape shape, Color color) {
+    public Tile(int UID, Shape shape, Color color) {
+        this.UID = UID;
         this.shape = shape;
         this.color = color;
     }
@@ -24,6 +26,10 @@ public class Tile implements Serializable {
         return this.color;
     }
 
+    public int UID() {
+        return UID;
+    }
+
     public Object getSimilar(Tile tile) {
         if (this.shape == tile.shape()) {
             return this.shape;
@@ -33,7 +39,6 @@ public class Tile implements Serializable {
             return null;
         }
     }
-
 
     @Override
     public boolean equals(Object obj) {
@@ -46,7 +51,7 @@ public class Tile implements Serializable {
 
     @Override
     public String toString() {
-        return color + "_" + shape;
+        return color + "-" + shape;
     }
 
 }

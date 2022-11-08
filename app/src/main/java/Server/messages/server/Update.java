@@ -5,16 +5,16 @@ import java.util.List;
 import Game.Models.Player;
 import Server.messages.Message;
 
-public class FinishedPlay extends Message{
-    private static final long serialVersionUID = 101L;
-    
+public class Update extends Message{
+    private static final long serialVersionUID = 111L;
+
     public List<Player> players;
     public Player player;
-    public String bagSize;
+    public int bag;
 
-    public FinishedPlay(List<Player> players, Player player, String bagSize){
+    public Update(List<Player> players, Player player, int bag) {
         this.players = players;
         this.player = player;
-        this.bagSize = bagSize;
+        this.bag = bag;
     }
 }

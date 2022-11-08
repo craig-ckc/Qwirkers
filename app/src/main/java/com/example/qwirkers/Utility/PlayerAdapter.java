@@ -115,10 +115,10 @@ public class PlayerAdapter extends RecyclerView.Adapter<PlayerAdapter.PlayerView
         public void setPlayer(Player player) {
             this.player = player;
 
-            playerName.setText(player.getName());
-            playerPoints.setText(String.valueOf(player.getPoints()));
-            playerHand.setText(String.valueOf(player.getHand().size()));
-            playerProfile.setImageResource(setAvatar(player.getAvatar()));
+            playerName.setText(player.name());
+            playerPoints.setText(String.valueOf(player.points()));
+            playerHand.setText(String.valueOf(player.hand().size()));
+            playerProfile.setImageResource(setAvatar(player.avatar()));
         }
 
         public void highlight() {

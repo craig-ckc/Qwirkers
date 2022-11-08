@@ -12,6 +12,7 @@ public class Player implements Serializable {
 	private final List<Tile> hand;
 	private int avatar;
 	private int points;
+	private int turn;
 	public static final int MAXHANDSIZE = 6;
 
 	public Player(String name) {
@@ -27,13 +28,13 @@ public class Player implements Serializable {
 		points = 0;
 	}
 
-	// add a tile to the players hand
-	public void receiveTile(Tile tile) {
+	public boolean receiveTile(Tile tile) {
 		if (hand.size() < MAXHANDSIZE)
-			hand.add(tile);
+			return hand.add(tile);
+
+		return false;
 	}
 
-	// This will return the tile taken from the players hand
 	public Tile removeTile(Tile tile) {
 		for (Tile t : hand) {
 			if (t.equals(tile)) {
@@ -43,33 +44,36 @@ public class Player implements Serializable {
 		return null;
 	}
 
-	public void emptyHand(){
-		hand.clear();
-	}
-
-	// add points to the players current points
 	public void addPoints(int points) {
 		this.points = this.points + points;
 	}
 
-	public List<Tile> getHand() {
+	public List<Tile> hand() {
 		return this.hand;
 	}
 
-	public int getPoints() {
+	public int points() {
 		return this.points;
 	}
 
-	public String getName() {
+	public String name() {
 		return this.name;
 	}
 
-	public int getAvatar() {
+	public int avatar() {
 		return avatar;
 	}
 
-	public int similarAttribute() {
-		List<Tile> tiles = this.getHand();
+	public void setTurn(int turn) {
+		this.turn = turn;
+	}
+
+	public int turn() {
+		return turn;
+	}
+
+	public int cluster() {
+		List<Tile> tiles = this.hand();
 		int colorCount = 0;
 		int shapeCount = 0;
 

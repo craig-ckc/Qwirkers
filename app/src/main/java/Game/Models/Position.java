@@ -19,11 +19,6 @@ public class Position implements Comparable<Position>{
 		return y;
 	}
 
-	public static Position getPosition(String position){
-		String[] pos = position.split(",");
-		return new Position(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]));
-	}
-
 	@Override
 	public String toString() {
 		return x + "," + y;

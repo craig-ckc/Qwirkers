@@ -44,7 +44,7 @@ public class GameRanking extends AppCompatActivity {
         playerList = (ArrayList<Player>) getIntent().getSerializableExtra(PLAYER_LIST);
 
         playerList = playerList.stream()
-                .sorted(Comparator.comparingInt(Player::getPoints).reversed())
+                .sorted(Comparator.comparingInt(Player::points).reversed())
                 .collect(Collectors.toList());
 
         first = playerList.remove(0);
@@ -55,11 +55,11 @@ public class GameRanking extends AppCompatActivity {
         first_ranker_name = findViewById(R.id.first_ranker_name);
         first_ranker_score = findViewById(R.id.first_ranker_score);
 
-        winner.setText(first.getName());
+        winner.setText(first.name());
         first_ranker.setText(String.valueOf(1));
-        first_rank_avatar.setImageResource(setAvatar(first.getAvatar()));
-        first_ranker_name.setText(first.getName());
-        first_ranker_score.setText(String.valueOf(first.getPoints()));
+        first_rank_avatar.setImageResource(setAvatar(first.avatar()));
+        first_ranker_name.setText(first.name());
+        first_ranker_score.setText(String.valueOf(first.points()));
 
         players = findViewById(R.id.rankers);
         players.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
@@ -80,10 +80,6 @@ public class GameRanking extends AppCompatActivity {
         Intent intent = new Intent(GameRanking.this, OfflineGame.class);
 
         playerList.add(first);
-
-        for (Player player : playerList) {
-            player.emptyHand();
-        }
 
         intent.putExtra(PLAYER_LIST, new ArrayList<>(playerList));
         startActivity(intent);

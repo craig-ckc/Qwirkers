@@ -11,19 +11,15 @@ import static com.example.qwirkers.Utility.Utilities.createHand;
 import static com.example.qwirkers.Utility.Utilities.createPlayers;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,27 +38,32 @@ import java.util.Arrays;
 import java.util.List;
 
 import Game.Enums.Dimension;
-import Game.Models.ClientGame;
-import Game.Models.Move;
+import Game.Models.Board;
 import Game.Models.Player;
-import Game.Models.Position;
 import Game.Models.Tile;
 import Server.Client;
 import Server.messages.Message;
-import Server.messages.client.FinishPlay;
+import Server.messages.client.Clear;
+import Server.messages.client.Finish;
+import Server.messages.client.GetValidMoves;
 import Server.messages.client.Join;
 import Server.messages.client.Leave;
-import Server.messages.client.PlayMove;
+import Server.messages.client.Pass;
+import Server.messages.client.Play;
 import Server.messages.client.Trade;
+import Server.messages.client.Undo;
 import Server.messages.server.Confirmation;
-import Server.messages.server.FinishedPlay;
+import Server.messages.server.Finished;
 import Server.messages.server.GameOver;
+import Server.messages.server.InvalidMove;
 import Server.messages.server.Joined;
 import Server.messages.server.Left;
-import Server.messages.server.PlayedMove;
+import Server.messages.server.Played;
+import Server.messages.server.Refill;
 import Server.messages.server.StartGame;
-import Server.messages.server.TileRefill;
-import Server.messages.server.Traded;
+import Server.messages.server.Undone;
+import Server.messages.server.Update;
+import Server.messages.server.ValidMoves;
 
 public class OnlineGame extends AppCompatActivity {
     private SharedPreferences sharedPref;
@@ -73,16 +74,15 @@ public class OnlineGame extends AppCompatActivity {
     private RecyclerView players;
     private Button bag;
 
-    private ClientGame game;
     private PlayerAdapter playerAdapter;
     private BoardAdapter boardAdapter;
     private HandAdapter handAdapter;
     private LobbyAvatarAdapter lobbyAvatarAdapter;
 
     private Tile selectedTile;
-    private List<Position> validMoves;
     private List<Tile> tradeTiles;
 
+    private Board boardData;
     private Player player;
     private Dialog waitingModal;
 
@@ -97,51 +97,29 @@ public class OnlineGame extends AppCompatActivity {
         client.setReceiver(message -> runOnUiThread(() -> onMessageReceived(message)));
         client.connect(sharedPref.getString(SERVER_ADDRESS, ""));
 
-        game = new ClientGame();
-
-        // region Helper arrays
-
-        validMoves = new ArrayList<>();
+        boardData = new Board();
         tradeTiles = new ArrayList<>();
-
-        // endregion
-
-        // region Hand view and adapter
 
         handAdapter = new HandAdapter(this, new ArrayList<>());
         hand = createHand(findViewById(R.id.player_hand), OnlineGame.this, handAdapter);
 
-        // endregion
-
-        // region Board view and adapter
-
-        boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.getBoard());
+        boardAdapter = new BoardAdapter(this, R.layout.game_tile, boardData.board());
         board = createBoard(findViewById(R.id.game_board), OnlineGame.this, boardAdapter);
-
-        // endregion
-
-        // region Players view and adapter
 
         List<Player> player_list = Arrays.asList(new Player("", -1), new Player("", -1));
 
-        playerAdapter = new PlayerAdapter(this, player_list, game.currentPlayer);
+        playerAdapter = new PlayerAdapter(this, player_list, new Player("", -1));
         players = createPlayers(findViewById(R.id.players), OnlineGame.this, playerAdapter);
-
-        // endregion
-
-        // region Bag button view
 
         bag = findViewById(R.id.bag);
         bag.setText("0");
 
-        // endregion
-
         handAdapter.setOnClickListener(view -> {
-            // when it is not players turn do nothing
-            if (!playerAdapter.currentPlayer().equals(player))
+            // TODO: unable to play condition
+            if(player.equals(playerAdapter.currentPlayer())){
                 return;
+            }
 
-            // Get view holder of the view.
             HandAdapter.TileViewHolder viewHolder = (HandAdapter.TileViewHolder) hand.findContainingViewHolder(view);
 
             if (selectedTile == viewHolder.tile) {
@@ -150,16 +128,12 @@ public class OnlineGame extends AppCompatActivity {
                 return;
             }
 
-            // Get the tile from the view holder
             selectedTile = viewHolder.tile;
 
-            // Do something with the tile.
             handAdapter.highlight(selectedTile);
 
-            validMoves = game.validMoves(selectedTile);
-
-            // TODO: Following code is slowing down app
-            boardAdapter.highlightValidMoves(validMoves);
+            // send request to server for list of valid moves
+            client.send(new GetValidMoves(selectedTile));
         });
 
         board.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -167,26 +141,16 @@ public class OnlineGame extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (selectedTile == null) return;
 
-                if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
-                    boardAdapter.notifyDataSetChanged();
+                handAdapter.remove(selectedTile);
 
-                    // deselect all blocks on the board
-                    validMoves.clear();
-                    boardAdapter.highlightValidMoves(validMoves);
+                // deselect all blocks on the board
+                boardAdapter.highlightValidMoves(new ArrayList<>());
 
-                    // deselect all tiles in hand
-                    selectedTile = null;
-                    handAdapter.highlight(selectedTile);
+                // deselect all tiles in hand
+                handAdapter.highlight(null);
 
-                    // message sent to server
-                    client.send(new PlayMove(client.session, boardAdapter.selectedPosition(i), selectedTile));
-
-                    handAdapter.notifyDataSetChanged();
-
-                    // update player card
-                    playerAdapter.notifyDataSetChanged();
-
-                }
+                // send play message to server
+                client.send(new Play(boardAdapter.selectedPosition(i), selectedTile));
             }
         });
 
@@ -229,7 +193,7 @@ public class OnlineGame extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.send(new Leave(client.session, client.name));
+                client.send(new Leave());
                 finish();
                 waitingModal.dismiss();
             }
@@ -242,23 +206,17 @@ public class OnlineGame extends AppCompatActivity {
 
     // DONE:
     public void done(View view) {
-        client.send(new FinishPlay(client.session));
-
-        cleanup();
+        client.send(new Finish());
     }
 
     // DONE:
     public void undo(View view) {
-        Move move = game.undoLastMove();
-
-        client.send(new PlayMove(client.session, move.getPosition(), move.getTile()));
+        client.send(new Undo());
     }
 
     // DONE:
     public void clear(View view) {
-        while (game.moves() > 0) {
-            undo(view);
-        }
+        client.send(new Clear());
     }
 
     // TODO: implement trade
@@ -272,7 +230,7 @@ public class OnlineGame extends AppCompatActivity {
         tradeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                client.send(new Trade(client.session, tradeTiles));
+                client.send(new Trade(tradeTiles));
                 tradeTiles.clear();
                 cleanup();
                 dialog.dismiss();
@@ -300,7 +258,7 @@ public class OnlineGame extends AppCompatActivity {
         // region Current Hand: tile that are still in your hand that will not be traded
 
         RecyclerView currentHand = dialog.findViewById(R.id.player_hand);
-        HandAdapter handAdapter_ = new HandAdapter(this, player.getHand());
+        HandAdapter handAdapter_ = new HandAdapter(this, player.hand());
         currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         currentHand.setAdapter(handAdapter_);
         currentHand.addItemDecoration(new EqualSpaceItemDecoration(5));
@@ -361,30 +319,25 @@ public class OnlineGame extends AppCompatActivity {
 
     // DONE:
     public void pass(View view) {
-        client.send(new Leave(client.session, client.name));
-
-        finish();
+        client.send(new Pass());
     }
 
     // DONE:
     public void quit(View view) {
-        client.send(new Leave(client.session, client.name));
-
+        client.send(new Leave());
         finish();
     }
 
     // DONE:
     private void cleanup() {
         // remove highlight on all blocks on the board
-        validMoves.clear();
-        boardAdapter.highlightValidMoves(validMoves);
+        boardAdapter.highlightValidMoves(new ArrayList<>());
 
         // deselect all tiles in hand
         selectedTile = null;
         handAdapter.highlight(null);
     }
 
-    // TODO:
     public void onMessageReceived(Message message) {
 
         // DONE:
@@ -396,23 +349,23 @@ public class OnlineGame extends AppCompatActivity {
 
             this.player = new Player(client.name, sharedPref.getInt(USER_AVATAR, -1));
 
-            client.send(new Join(msg.session, this.player));
-
-            Log.i("SERVER_MESSAGE", "Connection has been confirmed, player is registered as " + client.name);
+            client.send(new Join(this.player));
         }
 
         // DONE:
-        else if (message instanceof FinishedPlay) {
-            FinishedPlay msg = (FinishedPlay) message;
+        else if (message instanceof Finished) {
+            Finished msg = (Finished) message;
 
             playerAdapter.setPlayers(msg.players);
             playerAdapter.setCurrentPlayer(msg.player);
-            bag.setText(msg.bagSize);
+            bag.setText(String.valueOf(msg.bag));
+
+            findPlayer(msg.players);
 
             if(player.equals(msg.player))
                 Toast.makeText(OnlineGame.this, "It's your turn", Toast.LENGTH_SHORT).show();
             else
-                Toast.makeText(OnlineGame.this, "It's " + msg.player.getName() + "'s turn", Toast.LENGTH_SHORT).show();
+                Toast.makeText(OnlineGame.this, "It's " + msg.player.name() + "'s turn", Toast.LENGTH_SHORT).show();
         }
 
         // DONE:
@@ -426,6 +379,13 @@ public class OnlineGame extends AppCompatActivity {
         }
 
         // DONE:
+        else if (message instanceof InvalidMove) {
+            InvalidMove msg = (InvalidMove) message;
+
+            player.receiveTile(msg.tile);
+        }
+
+        // DONE:
         else if (message instanceof Joined) {
             Joined msg = (Joined) message;
 
@@ -435,125 +395,86 @@ public class OnlineGame extends AppCompatActivity {
                 Toast.makeText(OnlineGame.this, msg.name + " has joined the game!", Toast.LENGTH_SHORT).show();
         }
 
-        // DONE:
-        else if (message instanceof Left) {
+        // DONE
+        else if(message instanceof Left){
             Left msg = (Left) message;
 
             playerAdapter.setPlayers(msg.players);
             playerAdapter.setCurrentPlayer(msg.player);
-            bag.setText(msg.bagSize);
+            bag.setText(msg.bag);
 
             if (!client.name.equals(msg.name))
                 Toast.makeText(OnlineGame.this, msg.name + " has left the game!", Toast.LENGTH_SHORT).show();
         }
 
-        // DONE:
-        else if (message instanceof PlayedMove) {
-            PlayedMove msg = (PlayedMove) message;
+        // DONE
+        else if(message instanceof Played){
+            Played msg = (Played) message;
 
-            playerAdapter.setCurrentPlayer(msg.player);
-
-            game.placeTile(msg.tile, msg.position);
+            boardData.setBlock(msg.position, msg.tile);
 
             boardAdapter.notifyDataSetChanged();
         }
 
-        // DONE:
-        else if (message instanceof StartGame) {
+        // DONE
+        else if(message instanceof Refill){
+            Refill msg = (Refill) message;
+
+            for(Tile tile: msg.tiles)
+                handAdapter.add(tile);
+        }
+
+        // DONE
+        else if(message instanceof StartGame){
             StartGame msg = (StartGame) message;
             findPlayer(msg.players);
 
             playerAdapter.setPlayers(msg.players);
-            playerAdapter.setCurrentPlayer(msg.activePlayer);
+            playerAdapter.setCurrentPlayer(msg.player);
 
-            handAdapter.setTiles(this.player.getHand());
+            handAdapter.setTiles(this.player.hand());
 
-            bag.setText(msg.bagSize);
+            bag.setText(msg.bag);
 
             waitingModal.dismiss();
         }
 
-        // DONE:
-        else if (message instanceof TileRefill) {
-            TileRefill msg = (TileRefill) message;
+        // DONE
+        else if(message instanceof Trade){
+            Trade msg = (Trade) message;
 
-            if (msg.name.equals(client.name)) {
-
-                for (Tile tile : msg.tiles)
-                    handAdapter.add(tile);
-
-                return;
-            }
-
-            final Dialog dialog = createDialog(OnlineGame.this, R.layout.tile_notification, Gravity.BOTTOM, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-            TextView title = dialog.findViewById(R.id.modal_title);
-            title.setText("Refilling hand");
-
-            HandAdapter adapter = new HandAdapter(this, msg.tiles);
-            RecyclerView tiles = createHand(dialog.findViewById(R.id.tiles), OnlineGame.this, adapter);
-
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialogInterface) {
-                    new CountDownTimer(2000, 1000) {
-                        @Override
-                        public void onTick(long l) {
-
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            if (dialog.isShowing())
-                                dialog.dismiss();
-                        }
-                    };
-                }
-            });
-
-            dialog.show();
-
+            for(Tile tile: msg.tiles)
+                handAdapter.add(tile);
         }
 
-        // DONE:
-        else if (message instanceof Traded) {
-            Traded msg = (Traded) message;
+        // DONE
+        else if(message instanceof Undone){
+            Undone msg = (Undone) message;
 
-            if (msg.name.equals(client.name)) {
+            boardData.setBlock(msg.position, msg.tile);
 
-                for (Tile tile : msg.tiles)
-                    handAdapter.add(tile);
+            boardAdapter.notifyDataSetChanged();
+        }
 
-                return;
-            }
+        // DONE
+        else if(message instanceof Update){
+            Update msg = (Update) message;
 
-            final Dialog dialog = createDialog(OnlineGame.this, R.layout.tile_notification, Gravity.BOTTOM, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            findPlayer(msg.players);
 
-            TextView title = dialog.findViewById(R.id.modal_title);
-            title.setText("Tiles traded");
+            playerAdapter.setPlayers(msg.players);
+            playerAdapter.setCurrentPlayer(msg.player);
 
-            HandAdapter adapter = new HandAdapter(this, msg.tiles);
-            RecyclerView tiles = createHand(dialog.findViewById(R.id.tiles), OnlineGame.this, adapter);
+            handAdapter.setTiles(this.player.hand());
 
-            dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialogInterface) {
-                    new CountDownTimer(2000, 1000) {
-                        @Override
-                        public void onTick(long l) {
+            bag.setText(msg.bag);
+        }
 
-                        }
+        // DONE
+        else if(message instanceof ValidMoves){
+            ValidMoves msg = (ValidMoves) message;
 
-                        @Override
-                        public void onFinish() {
-                            if (dialog.isShowing())
-                                dialog.dismiss();
-                        }
-                    };
-                }
-            });
-
-            dialog.show();
+            boardAdapter.highlightValidMoves(msg.positions);
         }
 
     }
@@ -562,6 +483,7 @@ public class OnlineGame extends AppCompatActivity {
         for (Player player : players)
             if (this.player.equals(player)) {
                 this.player = player;
+                handAdapter.setTiles(this.player.hand());
                 return;
             }
     }

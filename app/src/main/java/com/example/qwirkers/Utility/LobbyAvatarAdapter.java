@@ -71,8 +71,8 @@ public class LobbyAvatarAdapter extends RecyclerView.Adapter<LobbyAvatarAdapter.
         public void setPlayer(Player player) {
             this.player = player;
 
-            playerName.setText(player.getName());
-            avatar.setImageResource(setAvatar(player.getAvatar()));
+            playerName.setText(player.name());
+            avatar.setImageResource(setAvatar(player.avatar()));
         }
 
     }

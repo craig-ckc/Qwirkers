@@ -63,9 +63,9 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.PlayerVi
             this.player = player;
 
             ranker_rank.setText(String.valueOf(players.indexOf(player) + 2));
-            ranker_name.setText(player.getName());
-            ranker_score.setText(String.valueOf(player.getPoints()));
-            ranker_avatar.setImageResource(setAvatar(player.getAvatar()));
+            ranker_name.setText(player.name());
+            ranker_score.setText(String.valueOf(player.points()));
+            ranker_avatar.setImageResource(setAvatar(player.avatar()));
         }
     }
 }

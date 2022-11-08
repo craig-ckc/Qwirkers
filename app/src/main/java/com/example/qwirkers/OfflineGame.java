@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Game.Enums.Dimension;
-import Game.Models.LocalGame;
+import Game.Models.Game;
 import Game.Models.Player;
 import Game.Models.Position;
 import Game.Models.Tile;
@@ -43,7 +43,7 @@ public class OfflineGame extends AppCompatActivity {
     private BoardAdapter boardAdapter;
     private HandAdapter handAdapter;
 
-    private LocalGame game;
+    private Game game;
     private Player currentPlayer;
     private Tile selectedTile;
     private List<Position> validMoves;
@@ -58,9 +58,9 @@ public class OfflineGame extends AppCompatActivity {
         ArrayList<Player> playerList = (ArrayList<Player>) getIntent().getSerializableExtra(PLAYER_LIST);
 
         // Game instance
-        game = new LocalGame(playerList);
+        game = new Game(playerList);
         game.start();
-        currentPlayer = game.getCurrentPlayer();
+        currentPlayer = game.currentPlayer();
 
         // region Helper arrays
 
@@ -77,7 +77,7 @@ public class OfflineGame extends AppCompatActivity {
         hand.setMinimumHeight((int) Math.round(Dimension.TILESIZE.getDim() * 1.1));
         hand.setMinimumWidth((int) Math.round(Dimension.TILESIZE.getDim() * 6.6));
 
-        handAdapter = new HandAdapter(this, currentPlayer.getHand());
+        handAdapter = new HandAdapter(this, currentPlayer.hand());
         hand.setAdapter(handAdapter);
 
         // endregion
@@ -89,7 +89,7 @@ public class OfflineGame extends AppCompatActivity {
         board.requestLayout();
         board.setColumnWidth(Dimension.TILESIZE.getDim());
 
-        boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.getBoard(0));
+        boardAdapter = new BoardAdapter(this, R.layout.game_tile, game.board());
         board.setAdapter(boardAdapter);
 
         // endregion
@@ -99,7 +99,7 @@ public class OfflineGame extends AppCompatActivity {
         players.setLayoutManager(new GridLayoutManager(getApplicationContext(), 2));
         players.addItemDecoration(new EqualSpaceItemDecoration(5));
 
-        playerAdapter = new PlayerAdapter(this, game.getPlayers());
+        playerAdapter = new PlayerAdapter(this, game.players());
         playerAdapter.setCurrentPlayer(currentPlayer);
         players.setAdapter(playerAdapter);
 
@@ -108,7 +108,7 @@ public class OfflineGame extends AppCompatActivity {
         // region Bag button view
 
         bag = findViewById(R.id.bag);
-        bag.setText(String.valueOf(game.getBagSize()));
+        bag.setText(String.valueOf(game.bagCount()));
 
         // endregion
 
@@ -139,7 +139,7 @@ public class OfflineGame extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (selectedTile == null) return;
 
-                if (game.placeTile(selectedTile, boardAdapter.selectedPosition(i))) {
+                if (game.play(selectedTile, boardAdapter.selectedPosition(i))) {
                     boardAdapter.notifyDataSetChanged();
 
                     // deselect all blocks on the board
@@ -167,26 +167,26 @@ public class OfflineGame extends AppCompatActivity {
     public void done(View view) {
         if(game.done()){
             Intent intent = new Intent(this, GameRanking.class);
-            intent.putExtra(PLAYER_LIST, new ArrayList<>(game.getPlayers()));
+            intent.putExtra(PLAYER_LIST, new ArrayList<>(game.players()));
             finish();
             startActivity(intent);
         }
 
-        currentPlayer = game.getCurrentPlayer();
+        currentPlayer = game.currentPlayer();
         playerAdapter.setCurrentPlayer(currentPlayer);
-        handAdapter.setTiles(currentPlayer.getHand());
+        handAdapter.setTiles(currentPlayer.hand());
 
         cleanup();
     }
 
     public void undo(View view) {
-        game.undoLastMove();
+        game.undo();
 
         cleanup();
     }
 
     public void clear(View view) {
-        game.clearMoves();
+        game.clear();
 
         cleanup();
     }
@@ -229,7 +229,7 @@ public class OfflineGame extends AppCompatActivity {
         // region Current Hand: tile that are still in your hand that will not be traded
 
         RecyclerView currentHand = dialog.findViewById(R.id.player_hand);
-        HandAdapter handAdapter_ = new HandAdapter(this, currentPlayer.getHand());
+        HandAdapter handAdapter_ = new HandAdapter(this, currentPlayer.hand());
         currentHand.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         currentHand.setAdapter(handAdapter_);
         currentHand.addItemDecoration(new EqualSpaceItemDecoration(5));
@@ -291,10 +291,10 @@ public class OfflineGame extends AppCompatActivity {
     public void pass(View view) {
         game.passPlay();
 
-        currentPlayer = game.getCurrentPlayer();
+        currentPlayer = game.currentPlayer();
         playerAdapter.setCurrentPlayer(currentPlayer);
 
-        handAdapter.setTiles(currentPlayer.getHand());
+        handAdapter.setTiles(currentPlayer.hand());
 
         Toast.makeText(this, currentPlayer.toString(), Toast.LENGTH_SHORT).show();
 
@@ -314,7 +314,7 @@ public class OfflineGame extends AppCompatActivity {
         selectedTile = null;
         handAdapter.highlight(selectedTile);
 
-        bag.setText(String.valueOf(game.getBagSize()));
+        bag.setText(String.valueOf(game.bagCount()));
 
         boardAdapter.notifyDataSetChanged();
 

@@ -66,7 +66,7 @@ public class Client {
     }
 
     public void disconnect() {
-        send(new Leave(session, name));
+        send(new Leave());
     }
 
     private class ReadThread extends Thread {
